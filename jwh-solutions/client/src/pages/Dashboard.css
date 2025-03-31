@@ -44,6 +44,7 @@ body {
   margin-bottom: 30px;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--border-color);
+  text-align: left;
 }
 
 .dashboard-title h1 {
