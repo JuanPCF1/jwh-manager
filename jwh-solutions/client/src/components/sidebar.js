@@ -1,15 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom" // Import useNavigate
 import "./sidebar.css"
 
 const Sidebar = () => {
   const location = useLocation()
+  const navigate = useNavigate() // Initialize navigate
   const [isOpen, setIsOpen] = useState(true)
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
+  }
+
+  const handleLogout = () => {
+    // Perform any logout logic here (e.g., clearing tokens)
+    navigate("/") // Redirect to the login page
   }
 
   return (
@@ -160,6 +166,9 @@ const Sidebar = () => {
             <div className="user-role">Administrator</div>
           </div>
         </div>
+        <button className="logout-button" onClick={handleLogout}>
+          Log Out
+        </button>
       </div>
 
       <div className="toggle-button" onClick={toggleSidebar}>

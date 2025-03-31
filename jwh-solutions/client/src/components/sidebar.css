@@ -155,3 +155,22 @@
 .sidebar.open .toggle-button svg {
   transform: rotate(0deg); /* When open: points to the right (>) */
 }
+
+.logout-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e60000;
+}
