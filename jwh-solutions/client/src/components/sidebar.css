@@ -33,32 +33,7 @@
     font-weight: 600;
   }
   
-  .sidebar-search {
-    margin: 10px 15px 20px;
-    position: relative;
-  }
-  
-  .search-input {
-    width: 75%;
-    padding: 10px 15px 10px 40px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 20px;
-    color: white;
-    font-size: 14px;
-  }
-  
-  .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  .search-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.7);
-  }
+
   
   .sidebar-nav {
     flex: 1;
