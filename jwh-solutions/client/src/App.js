@@ -1,15 +1,16 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import "./App.css"
 
 // Import pages
-import Dashboard from "./pages/Dashboard";
-import Clients from "./pages/Clients";
-import Warehouses from "./pages/Warehouses";
-import Contracts from "./pages/Contracts";
-import Contents from "./pages/Contents";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Manage from "./pages/Manage"; // Import the Manage page
+import Dashboard from "./pages/Dashboard"
+import Clients from "./pages/Clients"
+import Warehouses from "./pages/Warehouses"
+import Contracts from "./pages/Contracts"
+import Contents from "./pages/Contents"
+import Login from "./pages/Login"
+import Signup from "./pages/Signup"
+import Manage from "./pages/Manage"
+import Settings from "./pages/Settings" // Import the Settings page
 
 function App() {
   return (
@@ -23,13 +24,13 @@ function App() {
           <Route path="/warehouses" element={<Warehouses />} />
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/contents" element={<Contents />} />
-          <Route path="/settings" element={<Dashboard />} />
-          <Route path="/manage" element={<Manage />} /> {/* Add the Manage route */}
+          <Route path="/settings" element={<Settings />} /> {/* Update to use Settings component */}
+          <Route path="/manage" element={<Manage />} />
         </Routes>
       </div>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App
 
