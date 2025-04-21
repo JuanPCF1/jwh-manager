@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import adminRouter from './routes/adminRoutes.js';
 import employeeRouter from './routes/employeeRoutes.js';
 import warehouselocationRouter from './routes/warehouselocationRoutes.js';
+import sectionRouter from './routes/sectionRoutes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use(passport.session());
 app.use(adminRouter);
 app.use(employeeRouter);
 app.use(warehouselocationRouter);
+app.use(sectionRouter);
 
 app.listen(port, () => {
     console.log(`App is running on port ${port}`);
