@@ -55,7 +55,7 @@ const Signup = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
 
@@ -64,11 +64,35 @@ const Signup = () => {
       return;
     }
 
-    // Send to backend here
-    console.log("Form submitted:", formData);
+    const payload = {
+      Employee_Name: formData.fullName,
+      Username: formData.username,
+      Password: formData.password,
+    };
 
-    alert("Account created successfully! Please login.");
-    router.push("/");
+    try {
+      const res = await fetch("http://localhost:5000/api/employee/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Error creating account:", errorData);
+        alert("Failed to create account.");
+        return;
+      }
+
+      alert("Account created successfully! Please login.");
+      router.push("/");
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      alert("Something went wrong!");
+    }
   };
 
   return (
