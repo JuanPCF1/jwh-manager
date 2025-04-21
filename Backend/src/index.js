@@ -4,6 +4,7 @@ import passport from 'passport'
 import session from 'express-session'
 import dotenv from 'dotenv';
 
+// Routes are imported here
 import adminRouter from './routes/adminRoutes.js';
 import contentRouter from './routes/contentRoutes.js'
 
@@ -32,6 +33,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Add all the routes here
 app.use(adminRouter);
 app.use(contentRouter);
 

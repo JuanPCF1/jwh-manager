@@ -24,3 +24,23 @@ export const createAdminController = async (req, res) => {
         res.status(500).json({ error: 'Failed to create admin' });
     }
 }
+
+export const deleteAdminController = async (req, res) => {
+    try {
+        const { Username } = req.params;
+
+        const [result] = await pool.query(
+            'DELETE FROM admin WHERE Username = ?',
+            [Username]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        res.status(200).json({ message: 'Admin deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting admin:', error);
+        res.status(500).json({ error: 'Failed to delete admin' });
+    }
+}
