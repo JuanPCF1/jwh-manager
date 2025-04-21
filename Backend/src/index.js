@@ -9,6 +9,7 @@ import adminRouter from './routes/adminRoutes.js';
 import contentRouter from './routes/contentRoutes.js';
 import clientRouter from './routes/clientRoutes.js';
 import companyRouter from './routes/companyRoutes.js';
+import contractRouter from './routes/contractRoutes.js'
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use(adminRouter);
 app.use(contentRouter);
 app.use(clientRouter);
 app.use(companyRouter);
+app.use(contractRouter);
 
 app.listen(port, () => {
     console.log(`App is running on port ${port}`);
