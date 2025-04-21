@@ -6,6 +6,6 @@ import { deleteClientController } from '../controllers/clientController.js';
 const router = express.Router();
 
 router.post('/api/client/create', createClientController);
-router.post('/api/client/delete', deleteClientController);
+router.delete('/api/client/delete/:ID', deleteClientController);
 
 export default router;

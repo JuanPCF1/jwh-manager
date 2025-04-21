@@ -25,7 +25,7 @@ export const deleteClientController = async (req, res) => {
         const { ID } = req.params;
 
         const [result] = await pool.query(
-            'DELETE FROM admin WHERE Username = ?',
+            'DELETE FROM client WHERE ID = ?',
             [ID]
         );
 

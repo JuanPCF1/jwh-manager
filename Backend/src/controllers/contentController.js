@@ -32,4 +32,6 @@ export const createContentController = async (req, res) => {
         // Return status on error be sure its right.
         res.status(500).json({ error: 'Failed to create content' });
     }
+
+    
 }
