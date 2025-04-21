@@ -5,6 +5,7 @@ import session from 'express-session'
 import dotenv from 'dotenv';
 
 import adminRouter from './routes/adminRoutes.js';
+import contentRouter from './routes/contentRoutes.js'
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(adminRouter);
+app.use(contentRouter);
 
 app.listen(port, () => {
     console.log(`App is running on port ${port}`);
