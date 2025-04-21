@@ -4,6 +4,7 @@ import passport from 'passport'
 import session from 'express-session'
 import dotenv from 'dotenv';
 
+// Routes are imported here
 import adminRouter from './routes/adminRoutes.js';
 
 dotenv.config();
@@ -31,6 +32,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Add all the routes here
 app.use(adminRouter);
 
 app.listen(port, () => {
