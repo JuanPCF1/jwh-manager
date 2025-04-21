@@ -32,6 +32,24 @@ export const createContentController = async (req, res) => {
         // Return status on error be sure its right.
         res.status(500).json({ error: 'Failed to create content' });
     }
+}
 
-    
+export const deleteContentController = async (req, res) => {
+    try {
+        const { Container_ID } = req.params;
+
+        const [result] = await pool.query(
+            'DELETE FROM content WHERE Container_ID = ?',
+            [Container_ID]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Content not found' });
+        }
+
+        res.status(200).json({ message: 'Content deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting admin:', error);
+        res.status(500).json({ error: 'Failed to delete content' });
+    }
 }
