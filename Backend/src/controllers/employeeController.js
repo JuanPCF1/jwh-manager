@@ -1,13 +1,15 @@
 import {pool} from '../db/database.js';
+import { hashPassword } from '../utils/authHelper.mjs';
 
 export const createEmployeeController = async (req, res) => {
     try {
-        const {Employee_Name } = req.body;
+        const {Employee_Name, Username, Password } = req.body;
+        const hashedPassword = hashPassword(Password);
 
         // Insert the new employee into the database
         const [result] = await pool.query(
-            'INSERT INTO employee (Employee_Name) VALUES (?)',
-            [Employee_Name]
+            'INSERT INTO employee (Employee_Name, Username, Password) VALUES (?,?,?)',
+            [Employee_Name, Username, hashedPassword]
         );
 
         res.status(201).json({
