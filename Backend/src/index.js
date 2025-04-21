@@ -9,6 +9,10 @@ import adminRouter from './routes/adminRoutes.js';
 import employeeRouter from './routes/employeeRoutes.js';
 import warehouselocationRouter from './routes/warehouselocationRoutes.js';
 import sectionRouter from './routes/sectionRoutes.js';
+import contentRouter from './routes/contentRoutes.js';
+import clientRouter from './routes/clientRoutes.js';
+import companyRouter from './routes/companyRoutes.js';
+import contractRouter from './routes/contractRoutes.js'
 
 dotenv.config();
 
@@ -40,6 +44,10 @@ app.use(adminRouter);
 app.use(employeeRouter);
 app.use(warehouselocationRouter);
 app.use(sectionRouter);
+app.use(contentRouter);
+app.use(clientRouter);
+app.use(companyRouter);
+app.use(contractRouter);
 
 app.listen(port, () => {
     console.log(`App is running on port ${port}`);
