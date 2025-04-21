@@ -8,21 +8,35 @@ import styles from "./Signup.module.css";
 const Signup = () => {
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
     username: "",
     password: "",
-    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({});
   const router = useRouter();
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [id]: value,
-    }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formErrors = validateForm();
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
+    try {
+      await createEmployee({
+        Employee_Name: formData.fullName,
+        Username: formData.username,
+        Password: formData.password,
+      });
+
+      alert("Account created successfully! Please login.");
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create account: " + err.message);
+    }
   };
 
   const validateForm = () => {
@@ -30,12 +44,6 @@ const Signup = () => {
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
     }
 
     if (!formData.username.trim()) {
@@ -48,33 +56,22 @@ const Signup = () => {
       newErrors.password = "Password must be at least 6 characters";
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formErrors = validateForm();
-
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      return;
-    }
-
-    // Send to backend here
-    console.log("Form submitted:", formData);
-
-    alert("Account created successfully! Please login.");
-    router.push("/");
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [id]: value,
+    }));
   };
 
   return (
     <div className={styles.signupContainer}>
       <div className={styles.signupBox}>
         <h1>Create Account</h1>
+        {errors.submit && <div className={styles.errorMessage}>{errors.submit}</div>}
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label htmlFor="fullName">Full Name</label>
@@ -86,18 +83,6 @@ const Signup = () => {
               onChange={handleChange}
             />
             {errors.fullName && <span className={styles.errorMessage}>{errors.fullName}</span>}
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            {errors.email && <span className={styles.errorMessage}>{errors.email}</span>}
           </div>
 
           <div className={styles.formGroup}>
@@ -124,20 +109,6 @@ const Signup = () => {
             {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder="Confirm your password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
-            {errors.confirmPassword && (
-              <span className={styles.errorMessage}>{errors.confirmPassword}</span>
-            )}
-          </div>
-
           <button type="submit" className={styles.signupButton}>
             Create Account
           </button>
@@ -151,5 +122,29 @@ const Signup = () => {
     </div>
   );
 };
+
+export async function createEmployee({ Employee_Name, Username, Password }) {
+  try {
+    const response = await fetch('http://localhost:5000/api/employee/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // required if your backend uses sessions/cookies
+      body: JSON.stringify({ Employee_Name, Username, Password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create employee');
+    }
+
+    const data = await response.json();
+    return data; // contains message and employeeId
+  } catch (error) {
+    console.error('Error creating employee:', error);
+    throw error;
+  }
+}
 
 export default Signup;
