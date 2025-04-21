@@ -29,9 +29,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
   }
   
   .manageTitle h1 {
@@ -367,4 +364,82 @@
       flex-direction: column;
     }
   }
+
+  .contractTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
   
+  .contractTable th,
+  .contractTable td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .contractTable th {
+    background-color: var(--card-color);
+    color: var(--text-color);
+    font-weight: bold;
+  }
+  
+  .contractTable tr:nth-child(even) {
+    background-color: var(--hover-color);
+  }
+  
+  .contractTable tr:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+  }
+  
+  .contractForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .contractForm input {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .contractForm input:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .contractForm label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 5px;
+  }
+  
+  .formRow {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .formActions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .createContractButton {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .createContractButton:hover {
+    background-color: var(--hover-color);
+  }
