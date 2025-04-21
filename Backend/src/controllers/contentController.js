@@ -27,7 +27,7 @@ export const createContentController = async (req, res) => {
         });
       // Error handleing  
     } catch (error) {
-        console.error('Error creating admin:', error);
+        console.error('Error creating content:', error);
 
         // Return status on error be sure its right.
         res.status(500).json({ error: 'Failed to create content' });

@@ -6,7 +6,8 @@ import dotenv from 'dotenv';
 
 // Routes are imported here
 import adminRouter from './routes/adminRoutes.js';
-import contentRouter from './routes/contentRoutes.js'
+import contentRouter from './routes/contentRoutes.js';
+import clientRouter from './routes/clientRoutes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use(passport.session());
 // Add all the routes here
 app.use(adminRouter);
 app.use(contentRouter);
+app.use(clientRouter);
 
 app.listen(port, () => {
     console.log(`App is running on port ${port}`);
