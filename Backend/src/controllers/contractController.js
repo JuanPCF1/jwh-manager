@@ -28,7 +28,7 @@ export const deleteContractController = async (req, res) => {
         const { Job_Number } = req.params;
 
         const [result] = await pool.query(
-            'DELETE FROM client WHERE `Job#\` = ?',
+            'DELETE FROM contract WHERE `Job#\` = ?',
             [Job_Number]
         );
 
