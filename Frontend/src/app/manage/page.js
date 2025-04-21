@@ -8,32 +8,85 @@ import styles from "./Manage.module.css";
 const Manage = () => {
   const router = useRouter();
 
+  // Mock data
+  const customers = [
+    { id: "CU001", name: "John Doe" },
+    { id: "CU002", name: "Jane Smith" },
+  ];
+
+  const crates = [
+    { id: "C123", contents: "Books", location: "A1", customerId: "CU001" },
+    { id: "C124", contents: "Electronics", location: "B2", customerId: "CU002" },
+    { id: "C125", contents: "Clothes", location: "C3", customerId: "CU001" },
+  ];
+
+  const contracts = [
+    { id: "CON001", job: "Job001", startDate: "2025-01-01", companyName: "ABC Corp", client: "John Doe", referredBy: "Jane Smith" },
+    { id: "CON002", job: "Job002", startDate: "2025-02-01", companyName: "XYZ Inc", client: "Jane Smith", referredBy: "John Doe" },
+  ];
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("contract");
   const [searchResults, setSearchResults] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedContract, setSelectedContract] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [newContract, setNewContract] = useState({
+    id: "",
+    job: "",
+    startDate: "",
+    companyName: "",
+    client: "",
+    referredBy: "",
+  });
+  const [isCreatingContract, setIsCreatingContract] = useState(false);
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setHasSearched(true);
 
-    try {
-      setTimeout(() => {
-        setSearchResults([]);
-        setIsLoading(false);
-      }, 500);
-    } catch (error) {
-      console.error("Error searching:", error);
-      setSearchResults([]);
+    setTimeout(() => {
+      if (searchType === "customer") {
+        const results = customers.filter((customer) =>
+          customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setSearchResults(results);
+      } else if (searchType === "contract") {
+        const results = contracts.filter((contract) =>
+          contract.id.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setSearchResults(results);
+      }
       setIsLoading(false);
-    }
+    }, 500);
   };
 
-  const handleViewDetails = (id) => {
-    alert(`View details for ${id}`);
+  const handleViewCustomerCrates = (customerId) => {
+    const customerCrates = crates.filter((crate) => crate.customerId === customerId);
+    setSelectedCustomer({ id: customerId, crates: customerCrates });
   };
+
+  const handleViewContractDetails = (contractId) => {
+    const contract = contracts.find((c) => c.id === contractId);
+    setSelectedContract(contract);
+  };
+
+  const handleCreateContract = () => {
+    setContracts([...contracts, newContract]);
+    setIsCreatingContract(false);
+    setNewContract({
+      id: "",
+      job: "",
+      startDate: "",
+      companyName: "",
+      client: "",
+      referredBy: "",
+    });
+  };
+
+ 
 
   return (
     <div className={styles.manageContainer}>
@@ -47,6 +100,12 @@ const Manage = () => {
               Search and manage contracts and customers
             </div>
           </div>
+          <button
+            onClick={() => setIsCreatingContract(true)}
+            className={styles.createContractButton}
+          >
+            Create New Contract
+          </button>
         </header>
 
         <section className={styles.searchSection}>
@@ -75,64 +134,14 @@ const Manage = () => {
               <div className={styles.searchInputContainer}>
                 <input
                   type="text"
-                  placeholder={`Search by ${searchType} ID, name, or ${
-                    searchType === "contract" ? "customer" : "contact"
-                  }`}
+                  placeholder={`Search by ${searchType} ID or name`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={styles.searchInput}
                 />
                 <button type="submit" className={styles.searchButton}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
                   Search
                 </button>
-              </div>
-
-              <div className={styles.searchFilters}>
-                {searchType === "contract" && (
-                  <>
-                    <div className={styles.filterGroup}>
-                      <label>Status</label>
-                      <select>
-                        <option value="">All</option>
-                        <option value="active">Active</option>
-                        <option value="pending">Pending</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                    </div>
-                    <div className={styles.filterGroup}>
-                      <label>Date Range</label>
-                      <div className={styles.dateInputs}>
-                        <input type="date" placeholder="From" />
-                        <input type="date" placeholder="To" />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {searchType === "customer" && (
-                  <div className={styles.filterGroup}>
-                    <label>Active Contracts</label>
-                    <select>
-                      <option value="">All</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                )}
               </div>
             </form>
           </div>
@@ -144,87 +153,169 @@ const Manage = () => {
               <div className={styles.spinner}></div>
               <p>Searching...</p>
             </div>
-          ) : hasSearched ? (
+          ) : hasSearched && searchType === "customer" ? (
             searchResults.length > 0 ? (
               <div className={styles.resultsCard}>
-                <div className={styles.resultsHeader}>
-                  <h2>Search Results</h2>
-                  <span className={styles.resultsCount}>
-                    {searchResults.length}{" "}
-                    {searchResults.length === 1 ? "result" : "results"} found
-                  </span>
-                </div>
-
-                <table className={styles.resultsTable}>
-                  <thead>
-                    <tr>
-                      {searchType === "contract" ? (
-                        <>
-                          <th>Contract ID</th>
-                          <th>Name</th>
-                          <th>Customer</th>
-                          <th>Status</th>
-                          <th>Start Date</th>
-                          <th>End Date</th>
-                          <th>Actions</th>
-                        </>
-                      ) : (
-                        <>
-                          <th>Customer ID</th>
-                          <th>Name</th>
-                          <th>Contact Person</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Active Contracts</th>
-                          <th>Actions</th>
-                        </>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {/* Placeholder for future mapped results */}
-                  </tbody>
-                </table>
+                <h2>Customers</h2>
+                <ul>
+                  {searchResults.map((customer) => (
+                    <li
+                      key={customer.id}
+                      onClick={() => handleViewCustomerCrates(customer.id)}
+                      className={styles.customerItem}
+                    >
+                      {customer.name}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ) : (
-              <div className={styles.noResults}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  <line x1="8" y1="11" x2="14" y2="11"></line>
-                </svg>
-                <h3>No results found</h3>
-                <p>Try adjusting your search terms or filters</p>
-              </div>
+              <p>No customers found</p>
             )
-          ) : (
+          ) : hasSearched && searchType === "contract" ? (
+            searchResults.length > 0 ? (
+              <div className={styles.resultsCard}>
+                <h2>Contracts</h2>
+                <ul>
+                  {searchResults.map((contract) => (
+                    <li
+                      key={contract.id}
+                      onClick={() => handleViewContractDetails(contract.id)}
+                      className={styles.contractItem}
+                    >
+                      {contract.id}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p>No contracts found</p>
+            )
+          ) : null}
+
+          {selectedCustomer && (
+            <div className={styles.resultsCard}>
+              <h2>Crates for {customers.find((c) => c.id === selectedCustomer.id).name}</h2>
+              <ul>
+                {selectedCustomer.crates.map((crate) => (
+                  <li key={crate.id} className={styles.crateItem}>
+                    {crate.contents} (ID: {crate.id})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {selectedContract && (
+            <div className={styles.resultsCard}>
+              <h2>Contract Details</h2>
+              <table className={styles.contractTable}>
+                <thead>
+                  <tr>
+                    <th>Job</th>
+                    <th>Start Date</th>
+                    <th>Company Name</th>
+                    <th>Client</th>
+                    <th>Referred By</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{selectedContract.job}</td>
+                    <td>{selectedContract.startDate}</td>
+                    <td>{selectedContract.companyName}</td>
+                    <td>{selectedContract.client}</td>
+                    <td>{selectedContract.referredBy}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {isCreatingContract && (
+            <div className={styles.resultsCard}>
+              <h2>Create New Contract</h2>
+              <form className={styles.contractForm}>
+                <div className={styles.formRow}>
+                  <label>Contract ID</label>
+                  <input
+                    type="text"
+                    value={newContract.id}
+                    onChange={(e) =>
+                      setNewContract({ ...newContract, id: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Job</label>
+                  <input
+                    type="text"
+                    value={newContract.job}
+                    onChange={(e) =>
+                      setNewContract({ ...newContract, job: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Start Date</label>
+                  <input
+                    type="date"
+                    value={newContract.startDate}
+                    onChange={(e) =>
+                      setNewContract({ ...newContract, startDate: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Company Name</label>
+                  <input
+                    type="text"
+                    value={newContract.companyName}
+                    onChange={(e) =>
+                      setNewContract({ ...newContract, companyName: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Client</label>
+                  <input
+                    type="text"
+                    value={newContract.client}
+                    onChange={(e) =>
+                      setNewContract({ ...newContract, client: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Referred By</label>
+                  <input
+                    type="text"
+                    value={newContract.referredBy}
+                    onChange={(e) =>
+                      setNewContract({ ...newContract, referredBy: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.formActions}>
+                  <button type="button" onClick={handleCreateContract}>
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingContract(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {!hasSearched && !isCreatingContract && (
             <div className={styles.initialSearchState}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
               <h3>Search for contracts or customers</h3>
               <p>Use the search form above to find what youre looking for</p>
+             
             </div>
           )}
         </section>
