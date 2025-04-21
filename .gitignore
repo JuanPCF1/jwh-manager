@@ -57,6 +57,7 @@ uploads/
 *.sqlite
 *.sqlite3
 *.db
+*.env
 
 # TypeScript declaration outputs (if you generate types)
 *.d.ts
