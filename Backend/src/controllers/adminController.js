@@ -6,6 +6,16 @@ export const createAdminController = async (req, res) => {
         const { Username, Password, Employee_ID, EnteredPin } = req.body;
         const hashedPassword = hashPassword(Password);
 
+        // Check if an employee exists with the given Employee_ID
+        const [employee] = await pool.query(
+            'SELECT * FROM employee WHERE Employee_ID = ?',
+            [Employee_ID]
+        );
+
+        if (employee.length === 0) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+        
         if (EnteredPin !== 456852) {
             return res.status(401).json({ message: 'Invalid PIN' });
         }
