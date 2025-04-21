@@ -224,7 +224,7 @@ const Manage = () => {
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
               <h3>Search for contracts or customers</h3>
-              <p>Use the search form above to find what you're looking for</p>
+              <p>Use the search form above to find what youre looking for</p>
             </div>
           )}
         </section>
