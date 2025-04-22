@@ -3,6 +3,7 @@ import { createContentController } from '../controllers/contentController.js';
 import { deleteContentController } from '../controllers/contentController.js';
 import { getAllContentController } from '../controllers/contentController.js';
 import { filterContentController } from '../controllers/contentController.js';
+import { updateContentController } from '../controllers/contentController.js';
 
 
 const router = express.Router();
@@ -18,5 +19,7 @@ router.get('/api/content/getAll', getAllContentController);
 // /api/content/filter?Client_ID=10&Section_ID=1&Job%23=25&Status=Completed
 
 router.get('/api/content/filter', filterContentController);
+router.patch('/api/content/update/:Container_ID', updateContentController);
+
 
 export default router;

@@ -131,3 +131,48 @@ export const filterContentController = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch content data" });
     }
 };
+
+export const updateContentController = async (req, res) => {
+    try {
+        const { Container_ID } = req.params;
+        const fieldsToUpdate = req.body;
+
+        // If nothing is provided to update
+        if (Object.keys(fieldsToUpdate).length === 0) {
+            return res.status(400).json({ error: "No fields provided for update" });
+        }
+
+        // Build SET clause dynamically
+        const setClauses = [];
+        const values = [];
+
+        for (const key in fieldsToUpdate) {
+            if (key === 'Job#') {
+                setClauses.push('`Job#` = ?');
+            } else {
+                setClauses.push(`${key} = ?`);
+            }
+            values.push(fieldsToUpdate[key]);
+        }
+
+        // Final query
+        const query = `
+            UPDATE content
+            SET ${setClauses.join(', ')}
+            WHERE Container_ID = ?
+        `;
+
+        values.push(Container_ID); // Add WHERE clause value at the end
+
+        const [result] = await pool.query(query, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Content not found' });
+        }
+
+        res.status(200).json({ message: 'Content updated successfully' });
+    } catch (error) {
+        console.error('Error updating content:', error);
+        res.status(500).json({ error: 'Failed to update content' });
+    }
+};
