@@ -8,15 +8,12 @@ import styles from "./Content.module.css";
 const ContentPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const preSearchedCrateId = searchParams.get("crateId"); // Get the crateId from the query parameter
+  const preSearchedCrateId = searchParams.get("crateId");
 
-  const [crateID, setCrateID] = useState(preSearchedCrateId || ""); // Initialize with the query parameter
+  const [crateID, setCrateID] = useState(preSearchedCrateId || "");
   const [crateDetails, setCrateDetails] = useState(null);
-  const [crates, setCrates] = useState([
-    { id: "C123", contents: "Books", location: "A1", status: "Active", type: "Books", dateIn: "2025-01-01", dateOut: "2025-12-31", cost: "$10", customer: "John Doe" },
-    { id: "C124", contents: "Electronics", location: "B2", status: "Inactive", type: "Electronics", dateIn: "2025-02-01", dateOut: "2025-11-30", cost: "$20", customer: "Jane Smith" },
-  ]);
-  const [activeSection, setActiveSection] = useState(null); // Tracks the active section: "add", "remove", or "move"
+  const [crates, setCrates] = useState([]);
+  const [activeSection, setActiveSection] = useState(null);
   const [newCrate, setNewCrate] = useState({
     Container_ID: "",
     Section_ID: "",
@@ -32,25 +29,36 @@ const ContentPage = () => {
   });
   const [newLocation, setNewLocation] = useState("");
 
+  // Fetch all crates on page load
   useEffect(() => {
-    if (preSearchedCrateId) {
-      handleSearch(); // Automatically search for the crate when the page loads
-    }
-  }, [preSearchedCrateId]);
+    fetch("http://localhost:5001/api/content/getAll") // Replace with your backend's base URL
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => setCrates(data))
+      .catch((err) => console.error("Error fetching crates:", err));
+  }, []);
 
+  // Search for a specific crate
   const handleSearch = () => {
-    const foundCrate = crates.find((c) => c.id === crateID);
-    if (foundCrate) {
-      setCrateDetails(foundCrate);
-      setActiveSection(null); // Close the section after searching
-    } else {
-      setCrateDetails({ error: "Crate not found" });
-    }
+    fetch("http://localhost:5001/api/content/filter?Section_ID")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.length > 0) {
+          setCrates(data); // Display only the filtered crate
+        } else {
+          setCrates([]); // Clear the list if no crate is found
+        }
+      })
+      .catch((err) => console.error("Error searching for crate:", err));
   };
 
   const handleAddCrate = () => {
     setCrates([...crates, newCrate]);
-    setActiveSection(null); // Close the section after adding
+    setActiveSection(null);
     setNewCrate({
       Container_ID: "",
       Section_ID: "",
@@ -67,22 +75,41 @@ const ContentPage = () => {
   };
 
   const handleRemoveCrate = () => {
-    setCrates(crates.filter((crate) => crate.id !== crateDetails.id));
-    setActiveSection(null); // Close the section after removing
-    setCrateDetails(null);
-    setCrateID("");
+    if (!crateDetails || !crateDetails.Container_ID) {
+      console.error("No crate selected for removal.");
+      return;
+    }
+
+    fetch(`http://localhost:5001/api/content/delete/${crateDetails.Container_ID}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data.message); // Log success message
+        // Remove the crate from the local state
+        setCrates(crates.filter((crate) => crate.Container_ID !== crateDetails.Container_ID));
+        setActiveSection(null);
+        setCrateDetails(null);
+        setCrateID("");
+      })
+      .catch((err) => console.error("Error removing crate:", err));
   };
 
   const handleMoveCrate = () => {
     if (crateDetails && newLocation) {
       setCrates(
         crates.map((crate) =>
-          crate.id === crateDetails.id
-            ? { ...crate, location: newLocation }
+          crate.Container_ID === crateDetails.Container_ID
+            ? { ...crate, Location_Name: newLocation }
             : crate
         )
       );
-      setActiveSection(null); // Close the section after moving
+      setActiveSection(null);
       setCrateDetails(null);
       setNewLocation("");
       setCrateID("");
@@ -90,10 +117,10 @@ const ContentPage = () => {
   };
 
   const handleSwitchSection = (section) => {
-    setActiveSection(section); // Switch to the selected section
-    setCrateDetails(null); // Reset any previous search results
-    setNewLocation(""); // Clear the new location input
-    setCrateID(""); // Clear the search input
+    setActiveSection(section);
+    setCrateDetails(null);
+    setNewLocation("");
+    setCrateID("");
   };
 
   return (
@@ -200,13 +227,13 @@ const ContentPage = () => {
             {crateDetails && !crateDetails.error && (
               <div className={styles.crateRow}>
                 <p>
-                  <strong>Crate ID:</strong> {crateDetails.id}
+                  <strong>Crate ID:</strong> {crateDetails.Container_ID}
                 </p>
                 <p>
-                  <strong>Contents:</strong> {crateDetails.contents}
+                  <strong>Contents:</strong> {crateDetails.Type}
                 </p>
                 <p>
-                  <strong>Location:</strong> {crateDetails.location}
+                  <strong>Location:</strong> {crateDetails.Location_Name}
                 </p>
                 <button
                   onClick={handleRemoveCrate}
@@ -238,13 +265,13 @@ const ContentPage = () => {
             {crateDetails && !crateDetails.error && (
               <div className={styles.crateRow}>
                 <p>
-                  <strong>Crate ID:</strong> {crateDetails.id}
+                  <strong>Crate ID:</strong> {crateDetails.Container_ID}
                 </p>
                 <p>
-                  <strong>Contents:</strong> {crateDetails.contents}
+                  <strong>Contents:</strong> {crateDetails.Type}
                 </p>
                 <p>
-                  <strong>Current Location:</strong> {crateDetails.location}
+                  <strong>Current Location:</strong> {crateDetails.Location_Name}
                 </p>
                 <div className={styles.newLocationSection}>
                   <label htmlFor="newLocation" className={styles.formLabel}>
@@ -269,27 +296,23 @@ const ContentPage = () => {
           </div>
         )}
 
-        {crateDetails && !crateDetails.error && (
-          <div className={styles.crateDetails}>
-            <h2>Crate Details</h2>
-            <p><strong>ID:</strong> {crateDetails.id}</p>
-            <p><strong>Contents:</strong> {crateDetails.contents}</p>
-            <p><strong>Location:</strong> {crateDetails.location}</p>
-            <p><strong>Status:</strong> {crateDetails.status}</p>
-            <p><strong>Type:</strong> {crateDetails.type}</p>
-            <p><strong>Date In:</strong> {crateDetails.dateIn}</p>
-            <p><strong>Date Out:</strong> {crateDetails.dateOut}</p>
-            <p><strong>Cost:</strong> {crateDetails.cost}</p>
-            <p><strong>Customer:</strong> {crateDetails.customer}</p>
-          </div>
-        )}
-
-        {crateDetails && crateDetails.error && (
-          <div className={styles.crateDetails}>
-            <h2>Error</h2>
-            <p>{crateDetails.error}</p>
-          </div>
-        )}
+        {/* Display All Crates */}
+        <div className={styles.cratesList}>
+          <h2>All Crates</h2>
+          {crates.length > 0 ? (
+            crates.map((crate) => (
+              <div key={crate.Container_ID} className={styles.crateRow}>
+                <p><strong>ID:</strong> {crate.Container_ID}</p>
+                <p><strong>Contents:</strong> {crate.Type}</p>
+                <p><strong>Location:</strong> {crate.Location_Name}</p>
+                <p><strong>Status:</strong> {crate.Status}</p>
+                <p><strong>Monthly Cost:</strong> {crate.Monthly_Cost}</p>
+              </div>
+            ))
+          ) : (
+            <p>No crates available</p>
+          )}
+        </div>
       </div>
     </div>
   );
