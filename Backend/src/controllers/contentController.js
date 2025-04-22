@@ -52,3 +52,28 @@ export const deleteContentController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete content' });
     }
 }
+
+export const getAllContentController = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                Section_ID,
+                Location_Name,
+                Store_Date,
+                Type,
+                Monthly_Cost,
+                Status,
+                Invoice_Code,
+                Client_ID,
+                Company_Name,
+                \`Job#\`
+                Container_ID
+            FROM content
+        `);
+
+        res.json(rows);
+    } catch (err) {
+        console.error("Error fetching content:", err);
+        res.status(500).json({ error: "Failed to fetch content data" });
+    }
+};
