@@ -66,12 +66,66 @@ export const getAllContentController = async (req, res) => {
                 Invoice_Code,
                 Client_ID,
                 Company_Name,
-                \`Job#\`
+                \`Job#\`,
                 Container_ID
             FROM content
         `);
 
         res.json(rows);
+    } catch (err) {
+        console.error("Error fetching content:", err);
+        res.status(500).json({ error: "Failed to fetch content data" });
+    }
+};
+
+
+export const filterContentController = async (req, res) => {
+    try {
+        const { Client_ID, Section_ID, Job, Status } = req.query;
+
+        // Start building the query
+        let query = `
+            SELECT 
+                Section_ID,
+                Location_Name,
+                Store_Date,
+                Type,
+                Monthly_Cost,
+                Status,
+                Invoice_Code,
+                Client_ID,
+                Company_Name,
+                \`Job#\`,
+                Container_ID
+            FROM content
+            WHERE 1=1
+        `;
+        const params = [];
+
+        // Add filters if they are provided
+        if (Client_ID) {
+            query += ' AND Client_ID = ?';
+            params.push(Client_ID);
+        }
+
+        if (Section_ID) {
+            query += ' AND Section_ID = ?';
+            params.push(Section_ID);
+        }
+
+        if (Job) {
+            query += ' AND \`Job#\` = ?';
+            params.push(Job);
+        }
+
+        if (Status) {
+            query += ' AND Status = ?';
+            params.push(Status);
+        }
+
+        const [rows] = await pool.query(query, params);
+        res.json(rows);
+
     } catch (err) {
         console.error("Error fetching content:", err);
         res.status(500).json({ error: "Failed to fetch content data" });
