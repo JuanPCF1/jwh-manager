@@ -97,9 +97,8 @@ export const getAllContentController = async (req, res) => {
 
 export const filterContentController = async (req, res) => {
     try {
-        const { Client_ID, Section_ID, Job, Status } = req.query;
+        const { Client_ID, Section_ID, Job, Status, Container_ID } = req.query;
 
-        // Start building the query
         let query = `
             SELECT 
                 Section_ID,
@@ -119,21 +118,22 @@ export const filterContentController = async (req, res) => {
         const params = [];
 
         // Add filters if they are provided
+        if (Container_ID) {
+            query += ' AND Container_ID = ?';
+            params.push(Container_ID);
+        }
         if (Client_ID) {
             query += ' AND Client_ID = ?';
             params.push(Client_ID);
         }
-
         if (Section_ID) {
             query += ' AND Section_ID = ?';
             params.push(Section_ID);
         }
-
         if (Job) {
             query += ' AND \`Job#\` = ?';
             params.push(Job);
         }
-
         if (Status) {
             query += ' AND Status = ?';
             params.push(Status);
@@ -147,6 +147,7 @@ export const filterContentController = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch content data" });
     }
 };
+
 
 export const updateContentController = async (req, res) => {
     try {
