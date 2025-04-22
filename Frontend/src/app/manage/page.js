@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import {useEffect} from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@components/Sidebar";
 import styles from "./Manage.module.css";
@@ -20,16 +21,17 @@ const Manage = () => {
     { id: "C125", contents: "Clothes", location: "C3", customerId: "CU001" },
   ];
 
-  const contracts = [
-    { id: "CON001", job: "Job001", startDate: "2025-01-01", companyName: "ABC Corp", client: "John Doe", referredBy: "Jane Smith" },
-    { id: "CON002", job: "Job002", startDate: "2025-02-01", companyName: "XYZ Inc", client: "Jane Smith", referredBy: "John Doe" },
-  ];
+  // const contracts = [
+  //   { id: "CON001", job: "Job001", startDate: "2025-01-01", companyName: "ABC Corp", client: "John Doe", referredBy: "Jane Smith" },
+  //   { id: "CON002", job: "Job002", startDate: "2025-02-01", companyName: "XYZ Inc", client: "Jane Smith", referredBy: "John Doe" },
+  // ];
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("contract");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedContract, setSelectedContract] = useState(null);
+  const [contracts, setContracts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [newContract, setNewContract] = useState({
@@ -55,7 +57,7 @@ const Manage = () => {
         setSearchResults(results);
       } else if (searchType === "contract") {
         const results = contracts.filter((contract) =>
-          contract.id.toLowerCase().includes(searchTerm.toLowerCase())
+          contract.id.includes(searchTerm.toLowerCase())
         );
         setSearchResults(results);
       }
@@ -69,6 +71,8 @@ const Manage = () => {
   };
 
   const handleViewContractDetails = (contractId) => {
+    // Get all the contacts with an API call to the backend
+
     const contract = contracts.find((c) => c.id === contractId);
     setSelectedContract(contract);
   };
@@ -86,6 +90,35 @@ const Manage = () => {
     });
   };
 
+    // Fetch all the contracts from the backend
+    useEffect(() => {
+      const fetchContracts = async () => {
+        try {
+          const res = await fetch("http://localhost:5001/api/contract/all", {
+            method: "GET",
+            credentials: "include",
+          });
+          const data = await res.json();
+    
+          // Normalize field names to match frontend expectations
+          const normalized = data.map((c) => ({
+            id: c["Job#"],
+            job: c["Job#"],
+            startDate: c["Start_Date"],
+            companyName: c["Company_Name"],
+            client: c["Client_ID"], // You can fetch the name later if needed
+            referredBy: c["Referred_By"] || "", // in case you have this too
+          }));
+    
+          setContracts(normalized);
+        } catch (error) {
+          console.error("Error fetching contracts:", error);
+        }
+      };
+    
+      fetchContracts();
+    }, []);
+    
  
 
   return (

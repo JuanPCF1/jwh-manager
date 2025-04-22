@@ -42,3 +42,16 @@ export const deleteContractController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete Contract' });
     }
 }
+
+export const getAllContractsController = async (req, res) => {
+    try {
+        const [result] = await pool.query(
+            'SELECT * FROM contract'
+        );
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error fetching contracts:', error);
+        res.status(500).json({ error: 'Failed to fetch contracts' });
+    }
+}
