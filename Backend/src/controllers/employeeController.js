@@ -42,3 +42,20 @@ export const deleteEmployeeController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete employee' });
     }
 }
+
+export const getAllEmployeeController = async (req, res) => {
+    try {
+      const [rows] = await pool.execute(`
+        SELECT 
+          Employee_ID,
+          Employee_Name,
+          Username
+        FROM employee
+      `);
+  
+      res.json(rows);
+    } catch (err) {
+      console.error("Error fetching employees:", err);
+      res.status(500).json({ error: "Failed to fetch employee data" });
+    }
+  };

@@ -69,3 +69,126 @@ export const countContentsController = async (req, res) => {
         res.status(500).json({ error: 'Failed to count contents' });
     }
 }
+export const getAllContentController = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                Section_ID,
+                Location_Name,
+                Store_Date,
+                Type,
+                Monthly_Cost,
+                Status,
+                Invoice_Code,
+                Client_ID,
+                Company_Name,
+                \`Job#\`,
+                Container_ID
+            FROM content
+        `);
+
+        res.json(rows);
+    } catch (err) {
+        console.error("Error fetching content:", err);
+        res.status(500).json({ error: "Failed to fetch content data" });
+    }
+};
+
+
+export const filterContentController = async (req, res) => {
+    try {
+        const { Client_ID, Section_ID, Job, Status } = req.query;
+
+        // Start building the query
+        let query = `
+            SELECT 
+                Section_ID,
+                Location_Name,
+                Store_Date,
+                Type,
+                Monthly_Cost,
+                Status,
+                Invoice_Code,
+                Client_ID,
+                Company_Name,
+                \`Job#\`,
+                Container_ID
+            FROM content
+            WHERE 1=1
+        `;
+        const params = [];
+
+        // Add filters if they are provided
+        if (Client_ID) {
+            query += ' AND Client_ID = ?';
+            params.push(Client_ID);
+        }
+
+        if (Section_ID) {
+            query += ' AND Section_ID = ?';
+            params.push(Section_ID);
+        }
+
+        if (Job) {
+            query += ' AND \`Job#\` = ?';
+            params.push(Job);
+        }
+
+        if (Status) {
+            query += ' AND Status = ?';
+            params.push(Status);
+        }
+
+        const [rows] = await pool.query(query, params);
+        res.json(rows);
+
+    } catch (err) {
+        console.error("Error fetching content:", err);
+        res.status(500).json({ error: "Failed to fetch content data" });
+    }
+};
+
+export const updateContentController = async (req, res) => {
+    try {
+        const { Container_ID } = req.params;
+        const fieldsToUpdate = req.body;
+
+        // If nothing is provided to update
+        if (Object.keys(fieldsToUpdate).length === 0) {
+            return res.status(400).json({ error: "No fields provided for update" });
+        }
+
+        // Build SET clause dynamically
+        const setClauses = [];
+        const values = [];
+
+        for (const key in fieldsToUpdate) {
+            if (key === 'Job#') {
+                setClauses.push('`Job#` = ?');
+            } else {
+                setClauses.push(`${key} = ?`);
+            }
+            values.push(fieldsToUpdate[key]);
+        }
+
+        // Final query
+        const query = `
+            UPDATE content
+            SET ${setClauses.join(', ')}
+            WHERE Container_ID = ?
+        `;
+
+        values.push(Container_ID); // Add WHERE clause value at the end
+
+        const [result] = await pool.query(query, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Content not found' });
+        }
+
+        res.status(200).json({ message: 'Content updated successfully' });
+    } catch (error) {
+        console.error('Error updating content:', error);
+        res.status(500).json({ error: 'Failed to update content' });
+    }
+};

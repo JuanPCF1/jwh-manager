@@ -54,3 +54,19 @@ export const deleteAdminController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete admin' });
     }
 }
+
+export const getAllAdminController = async (req, res) => {
+    try {
+      const [rows] = await pool.execute(`
+        SELECT 
+            Username,
+            Employee_ID
+        FROM admin
+      `);
+  
+      res.json(rows);
+    } catch (err) {
+      console.error("Error fetching admins:", err);
+      res.status(500).json({ error: "Failed to fetch admin data" });
+    }
+  };
