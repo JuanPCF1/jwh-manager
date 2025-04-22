@@ -77,18 +77,54 @@ const Manage = () => {
     setSelectedContract(contract);
   };
 
-  const handleCreateContract = () => {
-    setContracts([...contracts, newContract]);
-    setIsCreatingContract(false);
-    setNewContract({
-      id: "",
-      job: "",
-      startDate: "",
-      companyName: "",
-      client: "",
-      referredBy: "",
-    });
+  const handleCreateContract = async () => {
+    try {
+      const response = await fetch("http://localhost:5001/api/contract/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          "Job#": newContract.id,
+          "Start_Date": newContract.startDate,
+          "Company_Name": newContract.companyName,
+          "Client_ID": newContract.client,
+          "Referred_By": newContract.referredBy,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to create contract");
+      }
+  
+      const created = await response.json();
+  
+      setContracts([...contracts, {
+        id: created["Job#"],
+        job: created["Job#"],
+        startDate: created["Start_Date"],
+        companyName: created["Company_Name"],
+        client: created["Client_ID"],
+        referredBy: created["Referred_By"] || "",
+      }]);
+  
+      setIsCreatingContract(false);
+      setNewContract({
+        id: "",
+        job: "",
+        startDate: "",
+        companyName: "",
+        client: "",
+        referredBy: "",
+      });
+  
+    } catch (error) {
+      console.error("Error creating contract:", error);
+    }
   };
+  
+  
 
     // Fetch all the contracts from the backend
     useEffect(() => {
