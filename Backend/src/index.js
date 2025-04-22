@@ -19,7 +19,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const port = 5000;
+const port = 5001;
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
