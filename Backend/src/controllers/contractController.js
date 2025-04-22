@@ -55,3 +55,23 @@ export const getAllContractsController = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch contracts' });
     }
 }
+
+export const getContractByIdController = async (req, res) => {
+    try {
+        const { Job_Number } = req.params;
+
+        const [result] = await pool.query(
+            'SELECT * FROM contract WHERE `Job#` = ?',
+            [Job_Number]
+        );
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Contract not found' });
+        }
+
+        res.status(200).json(result[0]);
+    } catch (error) {
+        console.error('Error fetching contract:', error);
+        res.status(500).json({ error: 'Failed to fetch contract' });
+    }
+}

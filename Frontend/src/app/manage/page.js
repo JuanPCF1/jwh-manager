@@ -44,26 +44,50 @@ const Manage = () => {
   });
   const [isCreatingContract, setIsCreatingContract] = useState(false);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setHasSearched(true);
-
-    setTimeout(() => {
-      if (searchType === "customer") {
-        const results = customers.filter((customer) =>
-          customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setSearchResults(results);
-      } else if (searchType === "contract") {
-        const results = contracts.filter((contract) =>
-          contract.id.includes(searchTerm.toLowerCase())
-        );
-        setSearchResults(results);
-      }
+  
+    if (searchType === "customer") {
+      const results = customers.filter((customer) =>
+        customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results);
       setIsLoading(false);
-    }, 500);
+    } else if (searchType === "contract") {
+      try {
+        const res = await fetch(`http://localhost:5001/api/contract/${encodeURIComponent(searchTerm)}`, {
+          method: "GET",
+          credentials: "include",
+        });
+  
+        if (!res.ok) {
+          throw new Error("Contract not found");
+        }
+  
+        const contract = await res.json();
+  
+        // Normalize field names to match frontend expectations
+        const normalizedContract = {
+          id: contract["Job#"],
+          job: contract["Job#"],
+          startDate: contract["Start_Date"],
+          companyName: contract["Company_Name"],
+          client: contract["Client_ID"],
+          referredBy: contract["Referred_By"] || "",
+        };
+  
+        setSearchResults([normalizedContract]);
+      } catch (err) {
+        console.error("Error fetching contract:", err);
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
+  
 
   const handleViewCustomerCrates = (customerId) => {
     const customerCrates = crates.filter((crate) => crate.customerId === customerId);
@@ -71,8 +95,6 @@ const Manage = () => {
   };
 
   const handleViewContractDetails = (contractId) => {
-    // Get all the contacts with an API call to the backend
-
     const contract = contracts.find((c) => c.id === contractId);
     setSelectedContract(contract);
   };
