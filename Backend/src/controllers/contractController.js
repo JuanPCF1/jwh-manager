@@ -59,6 +59,10 @@ export const getAllContractsController = async (req, res) => {
 export const getContractByIdController = async (req, res) => {
     try {
         const { Job_Number } = req.params;
+        if (!Job_Number) {
+            // Call on the getAllContractsController if no Job_Number is provided
+            return await getAllContractsController(req, res);
+        }
 
         const [result] = await pool.query(
             'SELECT * FROM contract WHERE `Job#` = ?',

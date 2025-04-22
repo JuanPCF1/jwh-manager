@@ -9,6 +9,7 @@ const router = express.Router();
 router.post('/api/contract/create', createContractController);
 router.delete('/api/contract/delete/:Job_Number', deleteContractController);
 router.get('/api/contract/all', getAllContractsController);
+router.get('/api/contract/', getAllContractsController)
 router.get('/api/contract/:Job_Number', getContractByIdController);
 
 

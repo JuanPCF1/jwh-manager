@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@components/Sidebar";
 import styles from "./Manage.module.css";
@@ -35,12 +35,11 @@ const Manage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [newContract, setNewContract] = useState({
-    id: "",
-    job: "",
-    startDate: "",
-    companyName: "",
-    client: "",
-    referredBy: "",
+    "Job#": "",
+    "Start_Date": "",
+    "Company_Name": "",
+    "Client_ID": "",
+    "Referred_By": "",
   });
   const [isCreatingContract, setIsCreatingContract] = useState(false);
 
@@ -57,30 +56,23 @@ const Manage = () => {
       setIsLoading(false);
     } else if (searchType === "contract") {
       try {
+  
         const res = await fetch(`http://localhost:5001/api/contract/${encodeURIComponent(searchTerm)}`, {
           method: "GET",
           credentials: "include",
         });
   
         if (!res.ok) {
-          throw new Error("Contract not found");
+          throw new Error("Contract(s) not found");
         }
   
-        const contract = await res.json();
+        const data = await res.json();
   
-        // Normalize field names to match frontend expectations
-        const normalizedContract = {
-          id: contract["Job#"],
-          job: contract["Job#"],
-          startDate: contract["Start_Date"],
-          companyName: contract["Company_Name"],
-          client: contract["Client_ID"],
-          referredBy: contract["Referred_By"] || "",
-        };
-  
-        setSearchResults([normalizedContract]);
+        // Backend returns either an array or a single object
+        const results = Array.isArray(data) ? data : [data];
+        setSearchResults(results);
       } catch (err) {
-        console.error("Error fetching contract:", err);
+        console.error("Error fetching contract(s):", err);
         setSearchResults([]);
       } finally {
         setIsLoading(false);
@@ -89,15 +81,17 @@ const Manage = () => {
   };
   
 
+
   const handleViewCustomerCrates = (customerId) => {
     const customerCrates = crates.filter((crate) => crate.customerId === customerId);
     setSelectedCustomer({ id: customerId, crates: customerCrates });
   };
 
-  const handleViewContractDetails = (contractId) => {
-    const contract = contracts.find((c) => c.id === contractId);
+  const handleViewContractDetails = (jobNumber) => {
+    const contract = [...contracts, ...searchResults].find((c) => c["Job#"] === jobNumber);
     setSelectedContract(contract);
   };
+
 
   const handleCreateContract = async () => {
     try {
@@ -107,77 +101,57 @@ const Manage = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          "Job#": newContract.id,
-          "Start_Date": newContract.startDate,
-          "Company_Name": newContract.companyName,
-          "Client_ID": newContract.client,
-          "Referred_By": newContract.referredBy,
-        }),
+        body: JSON.stringify(newContract),
       });
-  
+
+
       if (!response.ok) {
         throw new Error("Failed to create contract");
       }
-  
+
       const created = await response.json();
-  
-      setContracts([...contracts, {
-        id: created["Job#"],
-        job: created["Job#"],
-        startDate: created["Start_Date"],
-        companyName: created["Company_Name"],
-        client: created["Client_ID"],
-        referredBy: created["Referred_By"] || "",
-      }]);
-  
+
+      setContracts([...contracts, created]);
+
       setIsCreatingContract(false);
       setNewContract({
-        id: "",
-        job: "",
-        startDate: "",
-        companyName: "",
-        client: "",
-        referredBy: "",
+        "Job#": "",
+        "Start_Date": "",
+        "Company_Name": "",
+        "Client_ID": "",
+        "Referred_By": "",
       });
-  
+      
+
     } catch (error) {
       console.error("Error creating contract:", error);
     }
   };
+
+
+
+  // Fetch all the contracts from the backend
+  useEffect(() => {
+    const fetchContracts = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/contract/all", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
   
+        // Keep DB-style keys
+        setContracts(data);
+      } catch (error) {
+        console.error("Error fetching contracts:", error);
+      }
+    };
+  
+    fetchContracts();
+  }, []);
   
 
-    // Fetch all the contracts from the backend
-    useEffect(() => {
-      const fetchContracts = async () => {
-        try {
-          const res = await fetch("http://localhost:5001/api/contract/all", {
-            method: "GET",
-            credentials: "include",
-          });
-          const data = await res.json();
-    
-          // Normalize field names to match frontend expectations
-          const normalized = data.map((c) => ({
-            id: c["Job#"],
-            job: c["Job#"],
-            startDate: c["Start_Date"],
-            companyName: c["Company_Name"],
-            client: c["Client_ID"], // You can fetch the name later if needed
-            referredBy: c["Referred_By"] || "", // in case you have this too
-          }));
-    
-          setContracts(normalized);
-        } catch (error) {
-          console.error("Error fetching contracts:", error);
-        }
-      };
-    
-      fetchContracts();
-    }, []);
-    
- 
+
 
   return (
     <div className={styles.manageContainer}>
@@ -270,11 +244,11 @@ const Manage = () => {
                 <ul>
                   {searchResults.map((contract) => (
                     <li
-                      key={contract.id}
-                      onClick={() => handleViewContractDetails(contract.id)}
+                      key={contract["Job#"]}
+                      onClick={() => handleViewContractDetails(contract["Job#"])}
                       className={styles.contractItem}
                     >
-                      {contract.id}
+                      {contract["Job#"]}
                     </li>
                   ))}
                 </ul>
@@ -312,11 +286,11 @@ const Manage = () => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{selectedContract.job}</td>
-                    <td>{selectedContract.startDate}</td>
-                    <td>{selectedContract.companyName}</td>
-                    <td>{selectedContract.client}</td>
-                    <td>{selectedContract.referredBy}</td>
+                    <td>{selectedContract["Job#"]}</td>
+                    <td>{selectedContract["Start_Date"]}</td>
+                    <td>{selectedContract["Company_Name"]}</td>
+                    <td>{selectedContract["Client_ID"]}</td>
+                    <td>{selectedContract["Referred_By"]}</td>
                   </tr>
                 </tbody>
               </table>
@@ -328,65 +302,60 @@ const Manage = () => {
               <h2>Create New Contract</h2>
               <form className={styles.contractForm}>
                 <div className={styles.formRow}>
-                  <label>Contract ID</label>
+                  <label>Job#</label>
                   <input
                     type="text"
-                    value={newContract.id}
+                    value={newContract["Job#"]}
                     onChange={(e) =>
-                      setNewContract({ ...newContract, id: e.target.value })
+                      setNewContract({ ...newContract, "Job#": e.target.value })
                     }
                   />
                 </div>
-                <div className={styles.formRow}>
-                  <label>Job</label>
-                  <input
-                    type="text"
-                    value={newContract.job}
-                    onChange={(e) =>
-                      setNewContract({ ...newContract, job: e.target.value })
-                    }
-                  />
-                </div>
+
                 <div className={styles.formRow}>
                   <label>Start Date</label>
                   <input
                     type="date"
-                    value={newContract.startDate}
+                    value={newContract["Start_Date"]}
                     onChange={(e) =>
-                      setNewContract({ ...newContract, startDate: e.target.value })
+                      setNewContract({ ...newContract, "Start_Date": e.target.value })
                     }
                   />
                 </div>
+
                 <div className={styles.formRow}>
                   <label>Company Name</label>
                   <input
                     type="text"
-                    value={newContract.companyName}
+                    value={newContract["Company_Name"]}
                     onChange={(e) =>
-                      setNewContract({ ...newContract, companyName: e.target.value })
+                      setNewContract({ ...newContract, "Company_Name": e.target.value })
                     }
                   />
                 </div>
+
                 <div className={styles.formRow}>
-                  <label>Client</label>
+                  <label>Client ID</label>
                   <input
                     type="text"
-                    value={newContract.client}
+                    value={newContract["Client_ID"]}
                     onChange={(e) =>
-                      setNewContract({ ...newContract, client: e.target.value })
+                      setNewContract({ ...newContract, "Client_ID": e.target.value })
                     }
                   />
                 </div>
+
                 <div className={styles.formRow}>
                   <label>Referred By</label>
                   <input
                     type="text"
-                    value={newContract.referredBy}
+                    value={newContract["Referred_By"]}
                     onChange={(e) =>
-                      setNewContract({ ...newContract, referredBy: e.target.value })
+                      setNewContract({ ...newContract, "Referred_By": e.target.value })
                     }
                   />
                 </div>
+
                 <div className={styles.formActions}>
                   <button type="button" onClick={handleCreateContract}>
                     Save
@@ -406,7 +375,7 @@ const Manage = () => {
             <div className={styles.initialSearchState}>
               <h3>Search for contracts or customers</h3>
               <p>Use the search form above to find what youre looking for</p>
-             
+
             </div>
           )}
         </section>
