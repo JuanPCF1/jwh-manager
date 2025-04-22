@@ -52,3 +52,20 @@ export const deleteContentController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete content' });
     }
 }
+
+// Counts which contents have stuff in them
+export const countContentsController = async (req, res) => {
+    try {
+        const [result] = await pool.query(
+            'SELECT COUNT(*) AS Filled_Contents FROM CONTENT WHERE `Job#` IS NOT NULL AND `Job#` != \'\';'
+        );
+
+        res.status(200).json({
+            message: 'Content count retrieved successfully',
+            total: result[0].Filled_Contents
+        });
+    } catch (error) {
+        console.error('Error counting contents:', error);
+        res.status(500).json({ error: 'Failed to count contents' });
+    }
+}
