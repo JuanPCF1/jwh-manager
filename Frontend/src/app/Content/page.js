@@ -28,6 +28,7 @@ const ContentPage = () => {
     Job: "",
   });
   const [newLocation, setNewLocation] = useState("");
+  const [editCrate, setEditCrate] = useState(null);
 
   // Fetch all crates on page load
   useEffect(() => {
@@ -44,7 +45,7 @@ const ContentPage = () => {
 
   // Search for a specific crate
   const handleSearch = () => {
-    fetch("http://localhost:5001/api/content/filter?Section_ID")
+    fetch("http://localhost:5001/api/content/filter?Container_ID=" + crateID)
       .then((res) => res.json())
       .then((data) => {
         if (data.length > 0) {
@@ -74,13 +75,8 @@ const ContentPage = () => {
     });
   };
 
-  const handleRemoveCrate = () => {
-    if (!crateDetails || !crateDetails.Container_ID) {
-      console.error("No crate selected for removal.");
-      return;
-    }
-
-    fetch(`http://localhost:5001/api/content/delete/${crateDetails.Container_ID}`, {
+  const handleRemoveCrate = (containerId) => {
+    fetch(`http://localhost:5001/api/content/delete/${containerId}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -92,10 +88,7 @@ const ContentPage = () => {
       .then((data) => {
         console.log(data.message); // Log success message
         // Remove the crate from the local state
-        setCrates(crates.filter((crate) => crate.Container_ID !== crateDetails.Container_ID));
-        setActiveSection(null);
-        setCrateDetails(null);
-        setCrateID("");
+        setCrates(crates.filter((crate) => crate.Container_ID !== containerId));
       })
       .catch((err) => console.error("Error removing crate:", err));
   };
@@ -121,6 +114,42 @@ const ContentPage = () => {
     setCrateDetails(null);
     setNewLocation("");
     setCrateID("");
+  };
+
+  const handleEditCrate = (crate) => {
+    setEditCrate(crate);
+  };
+
+  const handleSaveEditCrate = () => {
+    if (!editCrate || !editCrate.Container_ID) {
+      console.error("No crate selected for editing.");
+      return;
+    }
+
+    fetch(`http://localhost:5001/api/content/update/${editCrate.Container_ID}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editCrate),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data.message); // Log success message
+        // Update the crate in the local state
+        setCrates(
+          crates.map((crate) =>
+            crate.Container_ID === editCrate.Container_ID ? editCrate : crate
+          )
+        );
+        setEditCrate(null); // Clear the edit form
+      })
+      .catch((err) => console.error("Error updating crate:", err));
   };
 
   return (
@@ -155,18 +184,6 @@ const ContentPage = () => {
               className={styles.actionButton}
             >
               Add Crate
-            </button>
-            <button
-              onClick={() => handleSwitchSection("remove")}
-              className={styles.actionButton}
-            >
-              Remove Crate
-            </button>
-            <button
-              onClick={() => handleSwitchSection("move")}
-              className={styles.actionButton}
-            >
-              Move Crate
             </button>
           </div>
         </div>
@@ -236,7 +253,7 @@ const ContentPage = () => {
                   <strong>Location:</strong> {crateDetails.Location_Name}
                 </p>
                 <button
-                  onClick={handleRemoveCrate}
+                  onClick={() => handleRemoveCrate(crateDetails.Container_ID)}
                   className={styles.removeButton}
                 >
                   Remove
@@ -302,11 +319,76 @@ const ContentPage = () => {
           {crates.length > 0 ? (
             crates.map((crate) => (
               <div key={crate.Container_ID} className={styles.crateRow}>
-                <p><strong>ID:</strong> {crate.Container_ID}</p>
-                <p><strong>Contents:</strong> {crate.Type}</p>
-                <p><strong>Location:</strong> {crate.Location_Name}</p>
-                <p><strong>Status:</strong> {crate.Status}</p>
-                <p><strong>Monthly Cost:</strong> {crate.Monthly_Cost}</p>
+                {editCrate && editCrate.Container_ID === crate.Container_ID ? (
+                  <div>
+                    {Object.keys(editCrate).map((field) => (
+                      <div key={field} className={styles.formRow}>
+                        <label htmlFor={field} className={styles.formLabel}>
+                          {field.replace("_", " ")}
+                        </label>
+                        <input
+                          type="text"
+                          id={field}
+                          name={field}
+                          value={editCrate[field] || ""} // Ensure value is never undefined
+                          onChange={(e) =>
+                            setEditCrate({
+                              ...editCrate,
+                              [e.target.name]: e.target.value,
+                            })
+                          }
+                          className={styles.formInput}
+                        />
+                      </div>
+                    ))}
+                    <div className={styles.formActions}>
+                      <button
+                        onClick={handleSaveEditCrate}
+                        className={styles.confirmButton}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditCrate(null)}
+                        className={styles.cancelButton}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p>
+                      <strong>ID:</strong> {crate.Container_ID}
+                    </p>
+                    <p>
+                      <strong>Contents:</strong> {crate.Type}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {crate.Location_Name}
+                    </p>
+                    <p>
+                      <strong>Status:</strong> {crate.Status}
+                    </p>
+                    <p>
+                      <strong>Monthly Cost:</strong> {crate.Monthly_Cost}
+                    </p>
+                    <div className={styles.crateActions}>
+                      <button
+                        onClick={() => handleEditCrate(crate)}
+                        className={styles.actionButton}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleRemoveCrate(crate.Container_ID)}
+                        className={styles.removeButton}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           ) : (
