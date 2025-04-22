@@ -39,3 +39,18 @@ export const deleteCompanyController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete company' });
     }
 }
+
+export const getAllCompanyController = async (req, res) => {
+    try {
+      const [rows] = await pool.execute(`
+        SELECT 
+            Company_Name
+        FROM company
+      `);
+  
+      res.json(rows);
+    } catch (err) {
+      console.error("Error fetching companies:", err);
+      res.status(500).json({ error: "Failed to fetch company data" });
+    }
+  };
