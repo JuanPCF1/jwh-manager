@@ -8,7 +8,6 @@ import styles from "./Signup.module.css";
 const Signup = () => {
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
     username: "",
     password: "",
     confirmPassword: "",
@@ -32,11 +31,6 @@ const Signup = () => {
       newErrors.fullName = "Full name is required";
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-    }
 
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
@@ -112,17 +106,6 @@ const Signup = () => {
             {errors.fullName && <span className={styles.errorMessage}>{errors.fullName}</span>}
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            {errors.email && <span className={styles.errorMessage}>{errors.email}</span>}
-          </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="username">Username</label>
