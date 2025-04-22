@@ -39,3 +39,20 @@ export const deleteClientController = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete client' });
     }
 }
+
+export const getAllClientController = async (req, res) => {
+    try {
+      const [rows] = await pool.execute(`
+        SELECT 
+            Client_Name,
+            Referred_by,
+            ID
+        FROM client
+      `);
+  
+      res.json(rows);
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+      res.status(500).json({ error: "Failed to fetch client data" });
+    }
+  };
