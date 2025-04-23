@@ -18,15 +18,15 @@ const ContentPage = () => {
     Container_ID: "",
     Section_ID: "",
     Location_Name: "",
-    Store_Date: "",
+    Store_Date: new Date().toISOString().split("T")[0], // today's date in YYYY-MM-DD
     Type: "",
-    Monthly_Cost: "",
+    Monthly_Cost: "172.00",
     Status: "",
     Invoice_Code: "",
     Client_ID: "",
     Company_Name: "",
     Job: "",
-  });
+  });  
   const [newLocation, setNewLocation] = useState("");
   const [editCrate, setEditCrate] = useState(null);
 
@@ -58,22 +58,43 @@ const ContentPage = () => {
   };
 
   const handleAddCrate = () => {
-    setCrates([...crates, newCrate]);
-    setActiveSection(null);
-    setNewCrate({
-      Container_ID: "",
-      Section_ID: "",
-      Location_Name: "",
-      Store_Date: "",
-      Type: "",
-      Monthly_Cost: "",
-      Status: "",
-      Invoice_Code: "",
-      Client_ID: "",
-      Company_Name: "",
-      Job: "",
-    });
+    const payload = {
+      ...newCrate,
+      ["Job#"]: newCrate.Job,
+    };
+    delete payload.Job;
+  
+    fetch("http://localhost:5001/api/content/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to add crate.");
+        return res.json();
+      })
+      .then((data) => {
+        setCrates([...crates, payload]); // optionally use returned data if backend sends full object
+        setActiveSection(null);
+        setNewCrate({
+          Container_ID: "",
+          Section_ID: "",
+          Location_Name: "",
+          Store_Date: new Date().toISOString().split("T")[0], // today's date again
+          Type: "",
+          Monthly_Cost: "172.00",
+          Status: "",
+          Invoice_Code: "",
+          Client_ID: "",
+          Company_Name: "",
+          Job: "",
+        });        
+      })
+      .catch((err) => console.error("Error creating crate:", err));
   };
+  
 
   const handleRemoveCrate = (containerId) => {
     fetch(`http://localhost:5001/api/content/delete/${containerId}`, {
@@ -367,7 +388,7 @@ const ContentPage = () => {
                       <strong>Contents:</strong> {crate.Type}
                     </p>
                     <p>
-                      <strong>Location:</strong> {crate.Location_Name}
+                      <strong>Location:</strong> {crate.Location_Name} - {crate.Section_ID}
                     </p>
                     <p>
                       <strong>Status:</strong> {crate.Status}
