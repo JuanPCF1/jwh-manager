@@ -8,7 +8,7 @@ import { filterWarehouseLocationController } from '../controllers/warehouselocat
 const router = express.Router();
 
 router.post('/api/warehouselocation/create', createWarehouseLocationController);
-router.delete('/api/warehouselocation/delete/:Location_ID', deleteWarehouseLocationController);
+router.delete('/api/warehouselocation/delete/:Location_Name', deleteWarehouseLocationController);
 router.get('/api/warehouselocation/getAll', getAllWarehouseLocationController);
 router.get('/api/warehouselocation/filter', filterWarehouseLocationController);
 
