@@ -218,27 +218,27 @@ const Manage = () => {
               <div className={styles.spinner}></div>
               <p>Searching...</p>
             </div>
-          ) : hasSearched && searchType === "customer" ? (
-            searchResults.length > 0 ? (
-              <div className={styles.resultsCard}>
-                <h2>Customers</h2>
-                <ul>
-                  {searchResults.map((customer) => (
-                    <li
-                      key={customer.id}
-                      onClick={() => handleViewCustomerCrates(customer.id)}
-                      className={styles.customerItem}
-                    >
-                      {customer.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p>No customers found</p>
-            )
-          ) : hasSearched && searchType === "contract" ? (
-            searchResults.length > 0 ? (
+          ) : hasSearched ? (
+            searchType === "customer" ? (
+              searchResults.length > 0 ? (
+                <div className={styles.resultsCard}>
+                  <h2>Customers</h2>
+                  <ul>
+                    {searchResults.map((customer) => (
+                      <li
+                        key={customer.id}
+                        onClick={() => handleViewCustomerCrates(customer.id)}
+                        className={styles.customerItem}
+                      >
+                        {customer.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p>No customers found</p>
+              )
+            ) : searchResults.length > 0 ? (
               <div className={styles.resultsCard}>
                 <h2>Contracts</h2>
                 <ul>
@@ -256,7 +256,37 @@ const Manage = () => {
             ) : (
               <p>No contracts found</p>
             )
-          ) : null}
+          ) : contracts.length > 0 ? (
+            <div className={styles.resultsCard}>
+              <h2>All Contracts</h2>
+              <div className={styles.contractList}>
+                {contracts.map((contract) => (
+                  <div key={contract["Job#"]} className={styles.contractItem}>
+                    <div
+                      className={styles.contractHeader}
+                      onClick={() =>
+                        setSelectedContract(
+                          selectedContract?.["Job#"] === contract["Job#"] ? null : contract
+                        )
+                      }
+                    >
+                      {contract["Job#"]}
+                    </div>
+                    {selectedContract?.["Job#"] === contract["Job#"] && (
+                      <div className={styles.contractDetails}>
+                        <p>Start Date: {contract["Start_Date"]}</p>
+                        <p>Company Name: {contract["Company_Name"]}</p>
+                        <p>Client: {contract["Client_ID"]}</p>
+                        <p>Referred By: {contract["Referred_By"]}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p>No contracts available</p>
+          )}
 
           {selectedCustomer && (
             <div className={styles.resultsCard}>
@@ -371,11 +401,10 @@ const Manage = () => {
             </div>
           )}
 
-          {!hasSearched && !isCreatingContract && (
+          {!hasSearched && !isCreatingContract && contracts.length === 0 && (
             <div className={styles.initialSearchState}>
               <h3>Search for contracts or customers</h3>
               <p>Use the search form above to find what youre looking for</p>
-
             </div>
           )}
         </section>
