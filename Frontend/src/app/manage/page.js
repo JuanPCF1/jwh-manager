@@ -26,7 +26,6 @@ const Manage = () => {
     "Start_Date": new Date().toISOString().split("T")[0], // Sets default to today
     "Company_Name": "",
     "Client_ID": "",
-    "Referred_By": "",
   });
 
   const [newClient, setNewClient] = useState({
@@ -146,7 +145,6 @@ const Manage = () => {
           "Start_Date": "",
           "Company_Name": "",
           "Client_ID": "",
-          "Referred_By": "",
         });
 
         // Show success message or update UI
@@ -377,10 +375,9 @@ const Manage = () => {
                         </button>
                         {expandedContract && expandedContract["Job#"] === item["Job#"] && (
                           <div className={styles.contractDetails}>
-                            <p><strong>Start Date:</strong> {expandedContract["Start_Date"]}</p>
+                            <p><strong>Start Date:</strong> {expandedContract["Start_Date"]?.split("T")[0]}</p>
                             <p><strong>Company Name:</strong> {expandedContract["Company_Name"]}</p>
                             <p><strong>Client ID:</strong> {expandedContract["Client_ID"]}</p>
-                            <p><strong>Referred By:</strong> {expandedContract["Referred_By"]}</p>
                           </div>
                         )}
                       </li>
@@ -421,10 +418,9 @@ const Manage = () => {
                       </button>
                       {expandedContract && expandedContract["Job#"] === contract["Job#"] && (
                         <div className={styles.contractDetails}>
-                          <p><strong>Start Date:</strong> {expandedContract["Start_Date"]}</p>
+                          <p><strong>Start Date:</strong> {expandedContract["Start_Date"]?.split("T")[0]}</p>
                           <p><strong>Company Name:</strong> {expandedContract["Company_Name"]}</p>
                           <p><strong>Client ID:</strong> {expandedContract["Client_ID"]}</p>
-                          <p><strong>Referred By:</strong> {expandedContract["Referred_By"]}</p>
                         </div>
                       )}
                     </li>
@@ -535,19 +531,6 @@ const Manage = () => {
                         value={newContract["Client_ID"]}
                         onChange={(e) =>
                           setNewContract({ ...newContract, "Client_ID": e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className={styles.formRow}>
-                      <label>Referred By</label>
-                      <input
-                        type="text"
-                        value={newContract["Referred_By"]}
-                        onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            "Referred_By": e.target.value,
-                          })
                         }
                       />
                     </div>
