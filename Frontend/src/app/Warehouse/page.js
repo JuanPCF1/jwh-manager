@@ -54,11 +54,12 @@ const Warehouse = () => {
           }
           return res.json();
         })
+        .then(() => {
+          return fetch("http://localhost:5001/api/warehouselocation/getAll");
+        })
+        .then((res) => res.json())
         .then((data) => {
-          setWarehouses([
-            ...warehouses,
-            { ...newWarehouse, Location_Name: data.locationId },
-          ]);
+          setWarehouses(data);
           setNewWarehouse({
             Location_Name: "",
             Num_of_Sections: "",
@@ -66,6 +67,7 @@ const Warehouse = () => {
           });
           setIsCreatingWarehouse(false);
         })
+
         .catch((err) =>
           console.error("Error creating warehouse location:", err)
         );
@@ -290,8 +292,8 @@ const Warehouse = () => {
         <section className={styles.warehouseListSection}>
           <h2>All Warehouses</h2>
           <div className={styles.warehouseList}>
-            {warehouses.map((warehouse) => (
-              <div key={warehouse.Location_Name} className={styles.warehouseItem}>
+            {warehouses.map((warehouse, index) => (
+              <div key={`warehouse-${warehouse.Location_Name || index}`} className={styles.warehouseItem}>
                 <div className={styles.warehouseDetails}>
                   <p>
                     <strong>Location:</strong> {warehouse.Location_Name}
@@ -342,8 +344,8 @@ const Warehouse = () => {
           <section className={styles.warehouseListSection}>
             <h2>Sections in {selectedWarehouse}</h2> {/* Display the selected warehouse name */}
             <div className={styles.warehouseList}>
-              {sections.map((section) => (
-                <div key={section.Section_ID} className={styles.warehouseItem}>
+              {sections.map((section, index) => (
+                <div key={`section-${section.Section_ID || index}`} className={styles.warehouseItem}>
                   <div className={styles.warehouseDetails}>
                     <p>
                       <strong>Section ID:</strong> {section.Section_ID}
