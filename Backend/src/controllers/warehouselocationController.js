@@ -22,12 +22,12 @@ export const createWarehouseLocationController = async (req, res) => {
 
 export const deleteWarehouseLocationController = async (req, res) => {
     try {
-        const { Location_ID } = req.params;
+        const { Location_Name } = req.params;
 
         // Delete the warehouse location from the database
         const [result] = await pool.query(
-            'DELETE FROM warehouse_location WHERE Location_ID = ?',
-            [Location_ID]
+            'DELETE FROM warehouse_location WHERE Location_Name = ?',
+            [Location_Name]
         );
 
         if (result.affectedRows === 0) {
