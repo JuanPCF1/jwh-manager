@@ -196,7 +196,7 @@ const ContentPage = () => {
               {Object.keys(newCrate).map((field) => (
                 <div key={field} className={styles.formRow}>
                   <label htmlFor={field} className={styles.formLabel}>
-                    {field.replace("_", " ")}
+                    {field === "Type" ? "Type of Content" : field.replace(/_/g, " ")}
                   </label>
                   <input
                     type="text"
@@ -210,6 +210,7 @@ const ContentPage = () => {
                   />
                 </div>
               ))}
+
               <div className={styles.formActions}>
                 <button onClick={handleAddCrate} className={styles.confirmButton}>
                   Save
@@ -324,13 +325,13 @@ const ContentPage = () => {
                     {Object.keys(editCrate).map((field) => (
                       <div key={field} className={styles.formRow}>
                         <label htmlFor={field} className={styles.formLabel}>
-                          {field.replace("_", " ")}
+                          {field === "Type" ? "Type of Content" : field.replace(/_/g, " ")}
                         </label>
                         <input
                           type="text"
                           id={field}
                           name={field}
-                          value={editCrate[field] || ""} // Ensure value is never undefined
+                          value={editCrate[field] || ""}
                           onChange={(e) =>
                             setEditCrate({
                               ...editCrate,
@@ -341,6 +342,7 @@ const ContentPage = () => {
                         />
                       </div>
                     ))}
+
                     <div className={styles.formActions}>
                       <button
                         onClick={handleSaveEditCrate}
