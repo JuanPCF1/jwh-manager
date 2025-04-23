@@ -32,7 +32,7 @@ const ContentPage = () => {
 
   // Fetch all crates on page load
   useEffect(() => {
-    fetch("http://localhost:5001/api/content/getAll") // Replace with your backend's base URL
+    fetch("http://localhost:5001/api/content/getAll") 
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
@@ -43,6 +43,13 @@ const ContentPage = () => {
       .catch((err) => console.error("Error fetching crates:", err));
   }, []);
 
+  const fetchCrates = () => {
+    fetch("http://localhost:5001/api/content/getAll")
+      .then((res) => res.json())
+      .then((data) => setCrates(data))
+      .catch((err) => console.error("Error fetching crates:", err));
+  };
+  
   // Search for a specific crate
   const handleSearch = () => {
     fetch("http://localhost:5001/api/content/filter?Container_ID=" + crateID)
@@ -63,7 +70,7 @@ const ContentPage = () => {
       ["Job#"]: newCrate.Job,
     };
     delete payload.Job;
-
+  
     fetch("http://localhost:5001/api/content/create", {
       method: "POST",
       headers: {
@@ -75,14 +82,14 @@ const ContentPage = () => {
         if (!res.ok) throw new Error("Failed to add crate.");
         return res.json();
       })
-      .then((data) => {
-        setCrates([...crates, payload]); // optionally use returned data if backend sends full object
+      .then(() => {
+        fetchCrates(); // Refresh full list
         setActiveSection(null);
         setNewCrate({
           Container_ID: "",
           Section_ID: "",
           Location_Name: "",
-          Store_Date: new Date().toISOString().split("T")[0], // today's date again
+          Store_Date: new Date().toISOString().split("T")[0],
           Type: "",
           Monthly_Cost: "172.00",
           Status: "",
@@ -94,6 +101,7 @@ const ContentPage = () => {
       })
       .catch((err) => console.error("Error creating crate:", err));
   };
+  
 
 
   const handleRemoveCrate = (containerId) => {
