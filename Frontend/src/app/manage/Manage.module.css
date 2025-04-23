@@ -465,6 +465,7 @@
   }
   
   .contractItem {
+    position: relative; /* Make the contract item a positioned container */
     background-color: var(--card-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -489,4 +490,193 @@
   
   .contractDetails p {
     margin: 5px 0;
+  }
+
+  .createButton {
+    background-color: var(--accent-color); /* Blue color */
+    color: var(--text-color); /* White text */
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px; /* Consistent padding */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 200px; /* Fixed width for consistency */
+    text-align: center; /* Center-align text */
+  }
+  
+  .createButton:hover {
+    background-color: #357ab8; /* Slightly darker blue on hover */
+  }
+
+  .deleteButton {
+    position: absolute; /* Position the button relative to the contract item */
+    bottom: 10px; /* Align to the bottom */
+    right: 10px; /* Align to the right */
+    padding: 5px 10px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .deleteButton:hover {
+    background-color: #d9363e;
+  }
+  
+  .backButton {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .backButton:hover {
+    background-color: #357ab8;
+  }
+
+  .contractItem, .customerItem {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .contractItem:hover, .customerItem:hover {
+    background-color: var(--hover-color);
+  }
+
+  .deleteButton {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  ;
+  }
+  
+  .deleteButton:hover {
+    background-color: #d9363e;
+  }
+
+  .createCard {
+    background-color: var(--card-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .createCard h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+  }
+  
+  .createForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .formRow {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .formRow label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 5px;
+  }
+  
+  .formRow input {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .formRow input:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .formActions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .saveButton {
+    padding: 10px 20px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .saveButton:hover {
+    background-color: #27ae60;
+  }
+  
+  .cancelButton {
+    padding: 10px 20px;
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .cancelButton:hover {
+    background-color: #c0392b;
+  }
+
+  .customerItem {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically center content */
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .customerItem:hover {
+    background-color: var(--hover-color);
+  }
+  
+  .deleteButton {
+    margin-left: auto; /* Push the button to the right */
+    padding: 5px 10px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .deleteButton:hover {
+    background-color: #d9363e;
   }
