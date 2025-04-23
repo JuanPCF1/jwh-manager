@@ -1,0 +1,194 @@
+.warehouseContainer {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.warehouseContent {
+  flex: 1;
+  padding: 20px;
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: margin-left 0.3s ease;
+}
+
+.warehouseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.warehouseTitle h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.warehouseSubtitle {
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 5px;
+}
+
+.createWarehouseButton {
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.createWarehouseButton:hover {
+  background-color: var(--hover-color);
+}
+
+.createWarehouseForm {
+  background-color: var(--card-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.formRow label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 5px;
+}
+
+.formRow input {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+}
+
+.warehouseListSection {
+  margin-top: 30px;
+}
+
+.warehouseList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.warehouseItem {
+  background-color: var(--card-color);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.warehouseDetails p {
+  margin: 5px 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.createSectionButton {
+  padding: 8px 12px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.createSectionButton:hover {
+  background-color: var(--hover-color);
+}
+
+.warehouseActions {
+  display: flex;
+  gap: 10px;
+}
+
+.createSectionButton,
+.viewSectionsButton,
+.deleteWarehouseButton,
+.saveButton,
+.cancelButton {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.createSectionButton {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+}
+
+.createSectionButton:hover {
+  background-color: var(--hover-color);
+}
+
+.viewSectionsButton {
+  background-color: var(--info-color);
+  color: var(--text-color);
+}
+
+.viewSectionsButton:hover {
+  background-color: #2980b9;
+}
+
+.deleteWarehouseButton {
+  background-color: var(--danger-color);
+  color: var(--text-color);
+}
+
+.deleteWarehouseButton:hover {
+  background-color: #c0392b;
+}
+
+.saveButton {
+  background-color: var(--success-color);
+  color: var(--text-color);
+}
+
+.saveButton:hover {
+  background-color: #27ae60;
+}
+
+.cancelButton {
+  background-color: var(--warning-color);
+  color: var(--text-color);
+}
+
+.cancelButton:hover {
+  background-color: #d35400;
+}
+
+.deleteSectionButton {
+  background-color: var(--danger-color);
+  color: var(--text-color);
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.deleteSectionButton:hover {
+  background-color: #c0392b;
+}

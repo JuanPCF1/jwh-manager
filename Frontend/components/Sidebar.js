@@ -61,6 +61,13 @@ const Sidebar = () => {
           <span>Contents</span>
         </Link>
 
+        <Link
+          href="/Warehouse"
+          className={`${styles.sidebarNavItem} ${pathname === "/Warehouse" ? styles.sidebarNavItemActive : ""}`}
+        >
+          <span>Warehouse</span>
+        </Link>
+
         <div className={styles.sidebarSectionTitle}>SHORTCUTS</div>
 
         <Link

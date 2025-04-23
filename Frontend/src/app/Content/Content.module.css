@@ -71,6 +71,10 @@
   cursor: pointer;
 }
 
+.actionButton:hover {
+  background-color: #3a7bd5;
+}
+
 .sectionContainer {
   background-color: var(--card-color);
   padding: 20px;
@@ -133,6 +137,12 @@
   background-color: var(--card-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
+}
+
+.crateActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .removeButton {

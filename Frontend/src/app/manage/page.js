@@ -9,22 +9,7 @@ import styles from "./Manage.module.css";
 const Manage = () => {
   const router = useRouter();
 
-  // Mock data
-  const customers = [
-    { id: "CU001", name: "John Doe" },
-    { id: "CU002", name: "Jane Smith" },
-  ];
-
-  const crates = [
-    { id: "C123", contents: "Books", location: "A1", customerId: "CU001" },
-    { id: "C124", contents: "Electronics", location: "B2", customerId: "CU002" },
-    { id: "C125", contents: "Clothes", location: "C3", customerId: "CU001" },
-  ];
-
-  // const contracts = [
-  //   { id: "CON001", job: "Job001", startDate: "2025-01-01", companyName: "ABC Corp", client: "John Doe", referredBy: "Jane Smith" },
-  //   { id: "CON002", job: "Job002", startDate: "2025-02-01", companyName: "XYZ Inc", client: "Jane Smith", referredBy: "John Doe" },
-  // ];
+  
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("contract");
@@ -32,6 +17,7 @@ const Manage = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedContract, setSelectedContract] = useState(null);
   const [contracts, setContracts] = useState([]);
+  const [clients, setClients] = useState([]); // New state for clients
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [newContract, setNewContract] = useState({
@@ -41,13 +27,19 @@ const Manage = () => {
     "Client_ID": "",
     "Referred_By": "",
   });
-  const [isCreatingContract, setIsCreatingContract] = useState(false);
+  const [newClient, setNewClient] = useState({
+    ID: "",
+    Client_Name: "",
+    Referred_by: "",
+  }); // New state for creating a client
+  const [isCreating, setIsCreating] = useState(false); // Unified state for creation
+  const [expandedContract, setExpandedContract] = useState(null); // Add a new state to track the expanded contract
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setHasSearched(true);
-  
+
     if (searchType === "customer") {
       const results = customers.filter((customer) =>
         customer.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -56,19 +48,19 @@ const Manage = () => {
       setIsLoading(false);
     } else if (searchType === "contract") {
       try {
-  
-        const res = await fetch(`http://localhost:5001/api/contract/${encodeURIComponent(searchTerm)}`, {
-          method: "GET",
-          credentials: "include",
-        });
-  
+        const res = await fetch(
+          `http://localhost:5001/api/contract/${encodeURIComponent(searchTerm)}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
         if (!res.ok) {
           throw new Error("Contract(s) not found");
         }
-  
+
         const data = await res.json();
-  
-        // Backend returns either an array or a single object
         const results = Array.isArray(data) ? data : [data];
         setSearchResults(results);
       } catch (err) {
@@ -79,58 +71,127 @@ const Manage = () => {
       }
     }
   };
-  
 
+  const handleCreate = async (e) => {
+    e.preventDefault(); // Prevent form submission
+    
+    if (searchType === "contract") {
+      try {
+        const response = await fetch("http://localhost:5001/api/contract/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(newContract),
+        });
 
-  const handleViewCustomerCrates = (customerId) => {
-    const customerCrates = crates.filter((crate) => crate.customerId === customerId);
-    setSelectedCustomer({ id: customerId, crates: customerCrates });
-  };
+        if (!response.ok) {
+          throw new Error("Failed to create contract");
+        }
 
-  const handleViewContractDetails = (jobNumber) => {
-    const contract = [...contracts, ...searchResults].find((c) => c["Job#"] === jobNumber);
-    setSelectedContract(contract);
-  };
-
-
-  const handleCreateContract = async () => {
-    try {
-      const response = await fetch("http://localhost:5001/api/contract/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(newContract),
-      });
-
-
-      if (!response.ok) {
-        throw new Error("Failed to create contract");
+        const created = await response.json();
+        setContracts([...contracts, created]);
+        setIsCreating(false);
+        setNewContract({
+          "Job#": "",
+          "Start_Date": "",
+          "Company_Name": "",
+          "Client_ID": "",
+          "Referred_By": "",
+        });
+        
+        // Show success message or update UI
+       
+      } catch (error) {
+        console.error("Error creating contract:", error);
+        
       }
+    } else if (searchType === "customer") {
+      try {
+        const response = await fetch("http://localhost:5001/api/client/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(newClient),
+        });
 
-      const created = await response.json();
+        if (!response.ok) {
+          throw new Error("Failed to create client");
+        }
 
-      setContracts([...contracts, created]);
-
-      setIsCreatingContract(false);
-      setNewContract({
-        "Job#": "",
-        "Start_Date": "",
-        "Company_Name": "",
-        "Client_ID": "",
-        "Referred_By": "",
-      });
-      
-
-    } catch (error) {
-      console.error("Error creating contract:", error);
+        const created = await response.json();
+        setClients([...clients, newClient]); // Add the new client to the list
+        setIsCreating(false);
+        setNewClient({
+          ID: "",
+          Client_Name: "",
+          Referred_by: "",
+        });
+        
+        // Show success message
+     
+      } catch (error) {
+        console.error("Error creating client:", error);
+     
+      }
     }
   };
 
+  const handleDeleteContract = async (jobNumber) => {
+    if (confirm("Are you sure you want to delete this contract?")) {
+      try {
+        const response = await fetch(
+          `http://localhost:5001/api/contract/delete/${jobNumber}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
 
+        if (!response.ok) {
+          throw new Error("Failed to delete contract");
+        }
 
-  // Fetch all the contracts from the backend
+        // Remove the deleted contract from the state
+        setContracts(contracts.filter((contract) => contract["Job#"] !== jobNumber));
+        setSearchResults(searchResults.filter((contract) => contract["Job#"] !== jobNumber));
+       
+      } catch (error) {
+        console.error("Error deleting contract:", error);
+      
+      }
+    }
+  };
+
+  const handleDeleteClient = async (clientId) => {
+    if (confirm("Are you sure you want to delete this client?")) {
+      try {
+        const response = await fetch(
+          `http://localhost:5001/api/client/delete/${clientId}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete client");
+        }
+
+        // Remove the deleted client from the state
+        setClients(clients.filter((client) => client.ID !== clientId));
+        setSearchResults(searchResults.filter((client) => client.ID !== clientId));
+      
+      } catch (error) {
+        console.error("Error deleting client:", error);
+        
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchContracts = async () => {
       try {
@@ -139,19 +200,43 @@ const Manage = () => {
           credentials: "include",
         });
         const data = await res.json();
-  
-        // Keep DB-style keys
         setContracts(data);
       } catch (error) {
         console.error("Error fetching contracts:", error);
       }
     };
-  
+
+    const fetchClients = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/client/getAll", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
+        setClients(data);
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+      }
+    };
+
     fetchContracts();
+    fetchClients();
   }, []);
-  
 
+  const handleViewCustomerCrates = (customerId) => {
+    const customerCrates = crates.filter((crate) => crate.customerId === customerId);
+    setSelectedCustomer({ id: customerId, crates: customerCrates });
+  };
 
+  const handleViewContractDetails = (jobNumber) => {
+    if (expandedContract && expandedContract["Job#"] === jobNumber) {
+      // Collapse if the same contract is clicked again
+      setExpandedContract(null);
+    } else {
+      const contract = [...contracts, ...searchResults].find((c) => c["Job#"] === jobNumber);
+      setExpandedContract(contract);
+    }
+  };
 
   return (
     <div className={styles.manageContainer}>
@@ -166,10 +251,10 @@ const Manage = () => {
             </div>
           </div>
           <button
-            onClick={() => setIsCreatingContract(true)}
-            className={styles.createContractButton}
+            onClick={() => setIsCreating(true)}
+            className={styles.createButton}
           >
-            Create New Contract
+            {searchType === "contract" ? "Create New Contract" : "Create New Client"}
           </button>
         </header>
 
@@ -218,152 +303,210 @@ const Manage = () => {
               <div className={styles.spinner}></div>
               <p>Searching...</p>
             </div>
-          ) : hasSearched && searchType === "customer" ? (
+          ) : hasSearched ? (
             searchResults.length > 0 ? (
               <div className={styles.resultsCard}>
-                <h2>Customers</h2>
+                <h2>{searchType === "contract" ? "Contracts" : "Customers"}</h2>
                 <ul>
-                  {searchResults.map((customer) => (
-                    <li
-                      key={customer.id}
-                      onClick={() => handleViewCustomerCrates(customer.id)}
-                      className={styles.customerItem}
-                    >
-                      {customer.name}
+                  {searchResults.map((item) =>
+                    searchType === "contract" ? (
+                      <li key={item["Job#"]} className={styles.contractItem}>
+                        <div onClick={() => handleViewContractDetails(item["Job#"])}>
+                          {item["Job#"]}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteContract(item["Job#"])}
+                          className={styles.deleteButton}
+                        >
+                          Delete
+                        </button>
+                        {expandedContract && expandedContract["Job#"] === item["Job#"] && (
+                          <div className={styles.contractDetails}>
+                            <p><strong>Start Date:</strong> {expandedContract["Start_Date"]}</p>
+                            <p><strong>Company Name:</strong> {expandedContract["Company_Name"]}</p>
+                            <p><strong>Client ID:</strong> {expandedContract["Client_ID"]}</p>
+                            <p><strong>Referred By:</strong> {expandedContract["Referred_By"]}</p>
+                          </div>
+                        )}
+                      </li>
+                    ) : (
+                      <li key={item.ID} className={styles.customerItem}>
+                        <div className={styles.customerInfo}>
+                          {item.Client_Name}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteClient(item.ID)}
+                          className={styles.deleteButton}
+                        >
+                          Delete
+                        </button>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+            ) : (
+              <p>No {searchType === "contract" ? "contracts" : "customers"} found</p>
+            )
+          ) : searchType === "contract" ? (
+            contracts.length > 0 ? (
+              <div className={styles.resultsCard}>
+                <h2>All Contracts</h2>
+                <ul>
+                  {contracts.map((contract) => (
+                    <li key={contract["Job#"]} className={styles.contractItem}>
+                      <div onClick={() => handleViewContractDetails(contract["Job#"])}>
+                        {contract["Job#"]}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteContract(contract["Job#"])}
+                        className={styles.deleteButton}
+                      >
+                        Delete
+                      </button>
+                      {expandedContract && expandedContract["Job#"] === contract["Job#"] && (
+                        <div className={styles.contractDetails}>
+                          <p><strong>Start Date:</strong> {expandedContract["Start_Date"]}</p>
+                          <p><strong>Company Name:</strong> {expandedContract["Company_Name"]}</p>
+                          <p><strong>Client ID:</strong> {expandedContract["Client_ID"]}</p>
+                          <p><strong>Referred By:</strong> {expandedContract["Referred_By"]}</p>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
               </div>
             ) : (
-              <p>No customers found</p>
+              <p>No contracts available</p>
             )
-          ) : hasSearched && searchType === "contract" ? (
-            searchResults.length > 0 ? (
-              <div className={styles.resultsCard}>
-                <h2>Contracts</h2>
-                <ul>
-                  {searchResults.map((contract) => (
-                    <li
-                      key={contract["Job#"]}
-                      onClick={() => handleViewContractDetails(contract["Job#"])}
-                      className={styles.contractItem}
-                    >
-                      {contract["Job#"]}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p>No contracts found</p>
-            )
-          ) : null}
-
-          {selectedCustomer && (
+          ) : clients.length > 0 ? (
             <div className={styles.resultsCard}>
-              <h2>Crates for {customers.find((c) => c.id === selectedCustomer.id).name}</h2>
+              <h2>All Customers</h2>
               <ul>
-                {selectedCustomer.crates.map((crate) => (
-                  <li key={crate.id} className={styles.crateItem}>
-                    {crate.contents} (ID: {crate.id})
+                {clients.map((client) => (
+                  <li key={client.ID} className={styles.customerItem}>
+                    <div className={styles.customerInfo}>
+                      {client.Client_Name}
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
+          ) : (
+            <p>No customers available</p>
           )}
 
-          {selectedContract && (
+          {isCreating && (
             <div className={styles.resultsCard}>
-              <h2>Contract Details</h2>
-              <table className={styles.contractTable}>
-                <thead>
-                  <tr>
-                    <th>Job</th>
-                    <th>Start Date</th>
-                    <th>Company Name</th>
-                    <th>Client</th>
-                    <th>Referred By</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{selectedContract["Job#"]}</td>
-                    <td>{selectedContract["Start_Date"]}</td>
-                    <td>{selectedContract["Company_Name"]}</td>
-                    <td>{selectedContract["Client_ID"]}</td>
-                    <td>{selectedContract["Referred_By"]}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {isCreatingContract && (
-            <div className={styles.resultsCard}>
-              <h2>Create New Contract</h2>
-              <form className={styles.contractForm}>
-                <div className={styles.formRow}>
-                  <label>Job#</label>
-                  <input
-                    type="text"
-                    value={newContract["Job#"]}
-                    onChange={(e) =>
-                      setNewContract({ ...newContract, "Job#": e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className={styles.formRow}>
-                  <label>Start Date</label>
-                  <input
-                    type="date"
-                    value={newContract["Start_Date"]}
-                    onChange={(e) =>
-                      setNewContract({ ...newContract, "Start_Date": e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className={styles.formRow}>
-                  <label>Company Name</label>
-                  <input
-                    type="text"
-                    value={newContract["Company_Name"]}
-                    onChange={(e) =>
-                      setNewContract({ ...newContract, "Company_Name": e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className={styles.formRow}>
-                  <label>Client ID</label>
-                  <input
-                    type="text"
-                    value={newContract["Client_ID"]}
-                    onChange={(e) =>
-                      setNewContract({ ...newContract, "Client_ID": e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className={styles.formRow}>
-                  <label>Referred By</label>
-                  <input
-                    type="text"
-                    value={newContract["Referred_By"]}
-                    onChange={(e) =>
-                      setNewContract({ ...newContract, "Referred_By": e.target.value })
-                    }
-                  />
-                </div>
-
+              <h2>
+                {searchType === "contract" ? "Create New Contract" : "Create New Client"}
+              </h2>
+              <form className={styles.createForm} onSubmit={handleCreate}>
+                {searchType === "contract" ? (
+                  <>
+                    <div className={styles.formRow}>
+                      <label>Job#</label>
+                      <input
+                        type="text"
+                        value={newContract["Job#"]}
+                        onChange={(e) =>
+                          setNewContract({ ...newContract, "Job#": e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <label>Start Date</label>
+                      <input
+                        type="date"
+                        value={newContract["Start_Date"]}
+                        onChange={(e) =>
+                          setNewContract({ ...newContract, "Start_Date": e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <label>Company Name</label>
+                      <input
+                        type="text"
+                        value={newContract["Company_Name"]}
+                        onChange={(e) =>
+                          setNewContract({
+                            ...newContract,
+                            "Company_Name": e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <label>Client ID</label>
+                      <input
+                        type="text"
+                        value={newContract["Client_ID"]}
+                        onChange={(e) =>
+                          setNewContract({ ...newContract, "Client_ID": e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <label>Referred By</label>
+                      <input
+                        type="text"
+                        value={newContract["Referred_By"]}
+                        onChange={(e) =>
+                          setNewContract({
+                            ...newContract,
+                            "Referred_By": e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.formRow}>
+                      <label>ID</label>
+                      <input
+                        type="text"
+                        value={newClient.ID}
+                        onChange={(e) =>
+                          setNewClient({ ...newClient, ID: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <label>Client Name</label>
+                      <input
+                        type="text"
+                        value={newClient.Client_Name}
+                        onChange={(e) =>
+                          setNewClient({ ...newClient, Client_Name: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <label>Referred By</label>
+                      <input
+                        type="text"
+                        value={newClient.Referred_by}
+                        onChange={(e) =>
+                          setNewClient({ ...newClient, Referred_by: e.target.value })
+                        }
+                      />
+                    </div>
+                  </>
+                )}
                 <div className={styles.formActions}>
-                  <button type="button" onClick={handleCreateContract}>
+                  <button 
+                    type="submit" 
+                    className={styles.saveButton}>
                     Save
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsCreatingContract(false)}
-                  >
+                  <button 
+                    type="button" 
+                    onClick={() => setIsCreating(false)} 
+                    className={styles.cancelButton}>
                     Cancel
                   </button>
                 </div>
@@ -371,13 +514,7 @@ const Manage = () => {
             </div>
           )}
 
-          {!hasSearched && !isCreatingContract && (
-            <div className={styles.initialSearchState}>
-              <h3>Search for contracts or customers</h3>
-              <p>Use the search form above to find what youre looking for</p>
-
-            </div>
-          )}
+       
         </section>
       </main>
     </div>

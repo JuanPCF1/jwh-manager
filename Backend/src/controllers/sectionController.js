@@ -18,7 +18,7 @@ export const createSectionController = async (req, res) => {
         console.error('Error creating section:', error);
         res.status(500).json({ error: 'Failed to create section' });
     }
-}
+};
 
 export const deleteSectionController = async (req, res) => {
     try {
@@ -39,4 +39,60 @@ export const deleteSectionController = async (req, res) => {
         console.error('Error deleting section:', error);
         res.status(500).json({ error: 'Failed to delete section' });
     }
-}
+};
+
+export const getAllSectionController = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                Location_Name,
+                Section_ID,
+                Status
+            FROM section
+            WHERE 1=1
+        `);
+
+        res.json(rows);
+    } catch (err) {
+        console.error("Error fetching sections:", err);
+        res.status(500).json({ error: "Failed to fetch sections data" });
+    }
+};
+
+export const filterSectionController = async (req, res) => {
+    try {
+        const { Location_Name, Section_ID, Status } = req.query;
+
+        let query = `
+            SELECT 
+                Location_Name,
+                Section_ID,
+                Status
+            FROM section
+            WHERE 1=1
+        `;
+        const params = [];
+
+        if (Location_Name) {
+            query += ' AND Location_Name = ?';
+            params.push(Location_Name);
+        }
+
+        if (Section_ID) {
+            query += ' AND Section_ID = ?';
+            params.push(Section_ID);
+        }
+
+        if (Status) {
+            query += ' AND Status = ?';
+            params.push(Status);
+        }
+
+        const [rows] = await pool.query(query, params);
+        res.json(rows);
+
+    } catch (err) {
+        console.error("Error filtering section:", err);
+        res.status(500).json({ error: "Failed to filter section" });
+    }
+};
