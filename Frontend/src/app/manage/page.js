@@ -465,7 +465,28 @@ const Manage = () => {
                           type="text"
                           value={newContract["Company_Name"]}
                           onChange={handleCompanyInputChange}
-                          onFocus={() => newContract["Company_Name"] && setShowSuggestions(true)}
+                          onFocus={async () => {
+                            if (newContract["Company_Name"].trim() !== "") {
+                              // If input already has text, fetch suggestions
+                              await handleCompanyInputChange({ target: { value: newContract["Company_Name"] } });
+                            } else {
+                              // If input is empty, you could show default suggestions or fetch all
+                              try {
+                                const res = await fetch("http://localhost:5001/api/company/getBySimilarity", {
+                                  method: "GET",
+                                  credentials: "include",
+                                });
+                                if (res.ok) {
+                                  const data = await res.json();
+                                  setCompanySuggestions(data);
+                                  setShowSuggestions(true);
+                                }
+                              } catch (err) {
+                                console.error("Error fetching default company suggestions:", err);
+                              }
+                            }
+                          }}
+                          
                           onBlur={() => setTimeout(() => setShowSuggestions(false), 100)} // allow click before hide
                         />
                         {showSuggestions && companySuggestions.length > 0 && (

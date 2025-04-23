@@ -10,5 +10,6 @@ router.post('/api/company/create', createCompanyController);
 router.delete('/api/company/delete/:Company_Name', deleteCompanyController);
 router.get('/api/company/getAll', getAllCompanyController);
 router.get('/api/company/getBySimilarity/:Company_Name', getCompanyBySimilarityController);
+router.get('/api/company/getBySimilarity', getCompanyBySimilarityController)
 
 export default router;

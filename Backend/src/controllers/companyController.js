@@ -55,21 +55,33 @@ export const getAllCompanyController = async (req, res) => {
     }
   };
 
-export const getCompanyBySimilarityController = async (req, res) => {
+  export const getCompanyBySimilarityController = async (req, res) => {
     try {
-        const { Company_Name } = req.params;
-        const [rows] = await pool.query(
-            `SELECT * FROM company WHERE Company_Name LIKE ?`,
-            [`%${Company_Name}%`]
+      const { Company_Name } = req.params;
+  
+      let rows;
+  
+      if (!Company_Name || Company_Name.trim() === "") {
+        // Fallback: return any 5 companies
+        [rows] = await pool.query(
+          `SELECT * FROM company LIMIT 5`
         );
-
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'No similar companies found' });
-        }
-
-        res.json(rows);
+      } else {
+        // Filtered search with LIKE
+        [rows] = await pool.query(
+          `SELECT * FROM company WHERE Company_Name LIKE ? LIMIT 5`,
+          [`%${Company_Name}%`]
+        );
+      }
+  
+      if (rows.length === 0) {
+        return res.status(404).json({ message: 'No similar companies found' });
+      }
+  
+      res.json(rows);
     } catch (error) {
-        console.error('Error fetching similar companies:', error);
-        res.status(500).json({ error: 'Failed to fetch similar companies' });
+      console.error('Error fetching similar companies:', error);
+      res.status(500).json({ error: 'Failed to fetch similar companies' });
     }
-}
+  };
+  
