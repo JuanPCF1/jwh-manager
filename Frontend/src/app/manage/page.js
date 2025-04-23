@@ -91,7 +91,7 @@ const Manage = () => {
         }
 
         const created = await response.json();
-        setContracts([...contracts, created]);
+        await fetchContracts();
         setIsCreating(false);
         setNewContract({
           "Job#": "",
@@ -192,7 +192,6 @@ const Manage = () => {
     }
   };
 
-  useEffect(() => {
     const fetchContracts = async () => {
       try {
         const res = await fetch("http://localhost:5001/api/contract/all", {
@@ -218,6 +217,9 @@ const Manage = () => {
         console.error("Error fetching clients:", error);
       }
     };
+
+  useEffect(() => {
+
 
     fetchContracts();
     fetchClients();
@@ -310,7 +312,7 @@ const Manage = () => {
                 <ul>
                   {searchResults.map((item) =>
                     searchType === "contract" ? (
-                      <li key={item["Job#"]} className={styles.contractItem}>
+                      <li key={`search-${item["Job#"]}`} className={styles.contractItem}>
                         <div onClick={() => handleViewContractDetails(item["Job#"])}>
                           {item["Job#"]}
                         </div>
@@ -354,7 +356,7 @@ const Manage = () => {
                 <h2>All Contracts</h2>
                 <ul>
                   {contracts.map((contract) => (
-                    <li key={contract["Job#"]} className={styles.contractItem}>
+                    <li key={`contract-${contract["Job#"]}`} className={styles.contractItem}>
                       <div onClick={() => handleViewContractDetails(contract["Job#"])}>
                         {contract["Job#"]}
                       </div>
