@@ -26,7 +26,7 @@ const ContentPage = () => {
     Client_ID: "",
     Company_Name: "",
     Job: "",
-  });  
+  });
   const [newLocation, setNewLocation] = useState("");
   const [editCrate, setEditCrate] = useState(null);
 
@@ -63,7 +63,7 @@ const ContentPage = () => {
       ["Job#"]: newCrate.Job,
     };
     delete payload.Job;
-  
+
     fetch("http://localhost:5001/api/content/create", {
       method: "POST",
       headers: {
@@ -90,11 +90,11 @@ const ContentPage = () => {
           Client_ID: "",
           Company_Name: "",
           Job: "",
-        });        
+        });
       })
       .catch((err) => console.error("Error creating crate:", err));
   };
-  
+
 
   const handleRemoveCrate = (containerId) => {
     fetch(`http://localhost:5001/api/content/delete/${containerId}`, {
@@ -219,19 +219,60 @@ const ContentPage = () => {
                   <label htmlFor={field} className={styles.formLabel}>
                     {field === "Type" ? "Type of Content" : field.replace(/_/g, " ")}
                   </label>
-                  <input
-                    type="text"
-                    id={field}
-                    name={field}
-                    value={newCrate[field]}
-                    onChange={(e) =>
-                      setNewCrate({ ...newCrate, [e.target.name]: e.target.value })
-                    }
-                    className={styles.formInput}
-                  />
+
+                  {field === "Status" ? (
+                    <>
+                      <input
+                        list="status-options"
+                        id="Status"
+                        name="Status"
+                        value={newCrate["Status"]}
+                        onChange={(e) =>
+                          setNewCrate({ ...newCrate, Status: e.target.value })
+                        }
+                        className={styles.formInput}
+                      />
+                      <datalist id="status-options">
+                        <option value="S/O" />
+                        <option value="Clean" />
+                        <option value="N/R" />
+                        <option value="TBC" />
+                      </datalist>
+                    </>
+                  ) : field === "Invoice_Code" ? (
+                    <>
+                      <input
+                        list="invoice-options"
+                        id="Invoice_Code"
+                        name="Invoice_Code"
+                        value={newCrate["Invoice_Code"]}
+                        onChange={(e) =>
+                          setNewCrate({ ...newCrate, Invoice_Code: e.target.value })
+                        }
+                        className={styles.formInput}
+                      />
+                      <datalist id="invoice-options">
+                        <option value="0" />
+                        <option value="1" />
+                        <option value="2" />
+                        <option value="3" />
+                        <option value="4" />
+                      </datalist>
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      id={field}
+                      name={field}
+                      value={newCrate[field]}
+                      onChange={(e) =>
+                        setNewCrate({ ...newCrate, [e.target.name]: e.target.value })
+                      }
+                      className={styles.formInput}
+                    />
+                  )}
                 </div>
               ))}
-
               <div className={styles.formActions}>
                 <button onClick={handleAddCrate} className={styles.confirmButton}>
                   Save
