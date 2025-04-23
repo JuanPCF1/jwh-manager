@@ -30,10 +30,10 @@ const Manage = () => {
   });
 
   const [newClient, setNewClient] = useState({
-    ID: "",
     Client_Name: "",
     Referred_by: "",
-  }); // New state for creating a client
+  });
+  
   const [isCreating, setIsCreating] = useState(false); // Unified state for creation
   const [expandedContract, setExpandedContract] = useState(null); // Add a new state to track the expanded contract
 
@@ -155,13 +155,18 @@ const Manage = () => {
         }
 
         const created = await response.json();
-        setClients([...clients, newClient]); // Add the new client to the list
+        await fetchClients();
         setIsCreating(false);
         setNewClient({
-          ID: "",
           Client_Name: "",
           Referred_by: "",
         });
+        
+        if (hasSearched) {
+          handleSearch(new Event("submit"));
+        }
+        
+        
 
         // Show success message
 
@@ -418,7 +423,7 @@ const Manage = () => {
               <h2>All Customers</h2>
               <ul>
                 {clients.map((client) => (
-                  <li key={client.ID} className={styles.customerItem}>
+                  <li key={`client-${client.ID || client.Client_Name}`} className={styles.customerItem}>
                     <div className={styles.customerInfo}>
                       {client.Client_Name}
                     </div>
@@ -533,17 +538,6 @@ const Manage = () => {
                   </>
                 ) : (
                   <>
-                    <div className={styles.formRow}>
-                      <label>ID</label>
-                      <input
-                        type="text"
-                        value={newClient.ID}
-                        onChange={(e) =>
-                          setNewClient({ ...newClient, ID: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
                     <div className={styles.formRow}>
                       <label>Client Name</label>
                       <input
