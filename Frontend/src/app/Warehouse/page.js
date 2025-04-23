@@ -17,7 +17,7 @@ const Warehouse = () => {
   const [newSection, setNewSection] = useState({
     Section_ID: "",
     Location_Name: "",
-    States: "",
+    Status: "",
   });
   const [sections, setSections] = useState([]);
 
@@ -95,7 +95,7 @@ const Warehouse = () => {
 
   // Create a new section
   const handleCreateSection = () => {
-    if (newSection.Section_ID && newSection.Location_Name && newSection.States) {
+    if (newSection.Section_ID && newSection.Location_Name && newSection.Status) {
       fetch("http://localhost:5001/api/section/create", {
         method: "POST",
         headers: {
@@ -114,7 +114,7 @@ const Warehouse = () => {
           setNewSection({
             Section_ID: "",
             Location_Name: "",
-            States: "",
+            Status: "",
           });
           setIsCreatingSection(false);
         })
@@ -261,12 +261,12 @@ const Warehouse = () => {
               />
             </div>
             <div className={styles.formRow}>
-              <label>States</label>
+              <label>Status</label>
               <input
                 type="text"
-                value={newSection.States}
+                value={newSection.Status}
                 onChange={(e) =>
-                  setNewSection({ ...newSection, States: e.target.value })
+                  setNewSection({ ...newSection, Status: e.target.value })
                 }
               />
             </div>
