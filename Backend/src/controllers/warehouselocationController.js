@@ -12,7 +12,7 @@ export const createWarehouseLocationController = async (req, res) => {
 
         res.status(201).json({
             message: 'Warehouse location created successfully',
-            locationId: result.insertId
+            Location_Name: result.insertId
         });
     } catch (error) {
         console.error('Error creating warehouse location:', error);

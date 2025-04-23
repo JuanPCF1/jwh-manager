@@ -194,4 +194,145 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .createCompanyButton {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   
+  .createCompanyButton:hover {
+    background-color: var(--hover-color);
+  }
+  
+  .createCompanyForm {
+    background-color: var(--card-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column; /* Stack title, input, and buttons vertically */
+    width: 100%; /* Make the form fill the entire width */
+  }
+
+  .formContent {
+    flex: 1; /* Allow the input field to take up available space */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .formTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px; /* Add spacing below the title */
+    text-align: left; /* Align the title to the left */
+    color: var(--text-color);
+  }
+  
+  .formRow {
+    display: flex; /* Use flexbox to align input and buttons horizontally */
+    justify-content: space-between; /* Space out the input and buttons */
+    align-items: center; /* Align items vertically in the center */
+    margin-bottom: -10px; /* Add spacing below the row */
+  }
+  
+  .formLabel {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+  }
+  
+  .formInput {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 14px;
+    width: 300px; /* Set a fixed width for the input field */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .formInput:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px var(--accent-color);
+    outline: none;
+  }
+  
+  .formActions {
+    display: flex; /* Use flexbox for horizontal alignment */
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px; /* Add spacing between the buttons */
+    margin-top: 20px; /* Add spacing above the buttons */
+  }
+  
+  .saveButton {
+    background-color: var(--success-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .saveButton:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+  }
+  
+  .cancelButton {
+    background-color: var(--danger-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .cancelButton:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+  }
+  
+  .companyListSection {
+    margin-top: 30px;
+  }
+  
+  .companyList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .companyItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-color);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .deleteCompanyButton {
+    background-color: var(--danger-color);
+    color: var(--text-color);
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .deleteCompanyButton:hover {
+    background-color: #c0392b;
+  }
