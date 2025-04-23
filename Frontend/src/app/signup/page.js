@@ -8,7 +8,6 @@ import styles from "./Signup.module.css";
 const Signup = () => {
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
     username: "",
     password: "",
     confirmPassword: "",
@@ -32,11 +31,6 @@ const Signup = () => {
       newErrors.fullName = "Full name is required";
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-    }
 
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
@@ -55,7 +49,7 @@ const Signup = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
 
@@ -64,11 +58,35 @@ const Signup = () => {
       return;
     }
 
-    // Send to backend here
-    console.log("Form submitted:", formData);
+    const payload = {
+      Employee_Name: formData.fullName,
+      Username: formData.username,
+      Password: formData.password,
+    };
 
-    alert("Account created successfully! Please login.");
-    router.push("/");
+    try {
+      const res = await fetch("http://localhost:5001/api/employee/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Error creating account:", errorData);
+        alert("Failed to create account.");
+        return;
+      }
+
+      alert("Account created successfully! Please login.");
+      router.push("/");
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      alert("Something went wrong!");
+    }
   };
 
   return (
@@ -88,17 +106,6 @@ const Signup = () => {
             {errors.fullName && <span className={styles.errorMessage}>{errors.fullName}</span>}
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            {errors.email && <span className={styles.errorMessage}>{errors.email}</span>}
-          </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="username">Username</label>

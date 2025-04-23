@@ -55,24 +55,17 @@ const Sidebar = () => {
         </Link>
 
         <Link
-          href="/clients"
-          className={`${styles.sidebarNavItem} ${pathname === "/clients" ? styles.sidebarNavItemActive : ""}`}
-        >
-          <span>Clients</span>
-        </Link>
-
-        <Link
-          href="/warehouses"
-          className={`${styles.sidebarNavItem} ${pathname === "/warehouses" ? styles.sidebarNavItemActive : ""}`}
-        >
-          <span>Warehouses</span>
-        </Link>
-
-        <Link
-          href="/contents"
-          className={`${styles.sidebarNavItem} ${pathname === "/contents" ? styles.sidebarNavItemActive : ""}`}
+          href="/Content"
+          className={`${styles.sidebarNavItem} ${pathname === "/Contents" ? styles.sidebarNavItemActive : ""}`}
         >
           <span>Contents</span>
+        </Link>
+
+        <Link
+          href="/Warehouse"
+          className={`${styles.sidebarNavItem} ${pathname === "/Warehouse" ? styles.sidebarNavItemActive : ""}`}
+        >
+          <span>Warehouse</span>
         </Link>
 
         <div className={styles.sidebarSectionTitle}>SHORTCUTS</div>

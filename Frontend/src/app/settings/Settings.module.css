@@ -1,5 +1,6 @@
 :root {
   --background-color: #1e1e2f;
+  --sidebar-color: #4169e1;
   --card-color: #29293d;
   --text-color: #ffffff;
   --accent-color: #4a90e2;
@@ -10,6 +11,17 @@
   --border-color: #2c3040;
   --hover-color: #34384c;
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  width: 100%;
+  height: 100%;
+}
+
 
 .settingsContainer {
   display: flex;
