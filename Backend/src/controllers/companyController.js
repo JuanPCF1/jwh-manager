@@ -54,3 +54,22 @@ export const getAllCompanyController = async (req, res) => {
       res.status(500).json({ error: "Failed to fetch company data" });
     }
   };
+
+export const getCompanyBySimilarityController = async (req, res) => {
+    try {
+        const { Company_Name } = req.params;
+        const [rows] = await pool.query(
+            `SELECT * FROM company WHERE Company_Name LIKE ?`,
+            [`%${Company_Name}%`]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'No similar companies found' });
+        }
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching similar companies:', error);
+        res.status(500).json({ error: 'Failed to fetch similar companies' });
+    }
+}

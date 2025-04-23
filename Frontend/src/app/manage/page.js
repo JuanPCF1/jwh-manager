@@ -9,8 +9,9 @@ import styles from "./Manage.module.css";
 const Manage = () => {
   const router = useRouter();
 
-  
 
+  const [companySuggestions, setCompanySuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("contract");
   const [searchResults, setSearchResults] = useState([]);
@@ -22,11 +23,12 @@ const Manage = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [newContract, setNewContract] = useState({
     "Job#": "",
-    "Start_Date": "",
+    "Start_Date": new Date().toISOString().split("T")[0], // Sets default to today
     "Company_Name": "",
     "Client_ID": "",
     "Referred_By": "",
   });
+
   const [newClient, setNewClient] = useState({
     ID: "",
     Client_Name: "",
@@ -72,9 +74,39 @@ const Manage = () => {
     }
   };
 
+  const handleCompanyInputChange = async (e) => {
+    const value = e.target.value;
+    setNewContract({ ...newContract, "Company_Name": value });
+
+    if (value.trim() === "") {
+      setCompanySuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5001/api/company/getBySimilarity/${encodeURIComponent(value)}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCompanySuggestions(data);
+        setShowSuggestions(true);
+      } else {
+        setCompanySuggestions([]);
+      }
+    } catch (err) {
+      console.error("Error fetching company suggestions:", err);
+      setCompanySuggestions([]);
+    }
+  };
+
+
   const handleCreate = async (e) => {
     e.preventDefault(); // Prevent form submission
-    
+
     if (searchType === "contract") {
       try {
         const response = await fetch("http://localhost:5001/api/contract/create", {
@@ -100,12 +132,12 @@ const Manage = () => {
           "Client_ID": "",
           "Referred_By": "",
         });
-        
+
         // Show success message or update UI
-       
+
       } catch (error) {
         console.error("Error creating contract:", error);
-        
+
       }
     } else if (searchType === "customer") {
       try {
@@ -130,12 +162,12 @@ const Manage = () => {
           Client_Name: "",
           Referred_by: "",
         });
-        
+
         // Show success message
-     
+
       } catch (error) {
         console.error("Error creating client:", error);
-     
+
       }
     }
   };
@@ -158,10 +190,10 @@ const Manage = () => {
         // Remove the deleted contract from the state
         setContracts(contracts.filter((contract) => contract["Job#"] !== jobNumber));
         setSearchResults(searchResults.filter((contract) => contract["Job#"] !== jobNumber));
-       
+
       } catch (error) {
         console.error("Error deleting contract:", error);
-      
+
       }
     }
   };
@@ -184,39 +216,39 @@ const Manage = () => {
         // Remove the deleted client from the state
         setClients(clients.filter((client) => client.ID !== clientId));
         setSearchResults(searchResults.filter((client) => client.ID !== clientId));
-      
+
       } catch (error) {
         console.error("Error deleting client:", error);
-        
+
       }
     }
   };
 
-    const fetchContracts = async () => {
-      try {
-        const res = await fetch("http://localhost:5001/api/contract/all", {
-          method: "GET",
-          credentials: "include",
-        });
-        const data = await res.json();
-        setContracts(data);
-      } catch (error) {
-        console.error("Error fetching contracts:", error);
-      }
-    };
+  const fetchContracts = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/contract/all", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      setContracts(data);
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+    }
+  };
 
-    const fetchClients = async () => {
-      try {
-        const res = await fetch("http://localhost:5001/api/client/getAll", {
-          method: "GET",
-          credentials: "include",
-        });
-        const data = await res.json();
-        setClients(data);
-      } catch (error) {
-        console.error("Error fetching clients:", error);
-      }
-    };
+  const fetchClients = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/client/getAll", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      setClients(data);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
 
   useEffect(() => {
 
@@ -428,16 +460,31 @@ const Manage = () => {
                     </div>
                     <div className={styles.formRow}>
                       <label>Company Name</label>
-                      <input
-                        type="text"
-                        value={newContract["Company_Name"]}
-                        onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            "Company_Name": e.target.value,
-                          })
-                        }
-                      />
+                      <div className={styles.suggestionContainer}>
+                        <input
+                          type="text"
+                          value={newContract["Company_Name"]}
+                          onChange={handleCompanyInputChange}
+                          onFocus={() => newContract["Company_Name"] && setShowSuggestions(true)}
+                          onBlur={() => setTimeout(() => setShowSuggestions(false), 100)} // allow click before hide
+                        />
+                        {showSuggestions && companySuggestions.length > 0 && (
+                          <ul className={styles.suggestionDropdown}>
+                            {companySuggestions.map((company, index) => (
+                              <li
+                                key={index}
+                                onClick={() => {
+                                  setNewContract({ ...newContract, "Company_Name": company.Company_Name });
+                                  setShowSuggestions(false);
+                                }}
+                                className={styles.suggestionItem}
+                              >
+                                {company.Company_Name}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     </div>
                     <div className={styles.formRow}>
                       <label>Client ID</label>
@@ -500,14 +547,14 @@ const Manage = () => {
                   </>
                 )}
                 <div className={styles.formActions}>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className={styles.saveButton}>
                     Save
                   </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setIsCreating(false)} 
+                  <button
+                    type="button"
+                    onClick={() => setIsCreating(false)}
                     className={styles.cancelButton}>
                     Cancel
                   </button>
@@ -516,7 +563,7 @@ const Manage = () => {
             </div>
           )}
 
-       
+
         </section>
       </main>
     </div>
