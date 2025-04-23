@@ -70,3 +70,35 @@ export const getAllAdminController = async (req, res) => {
       res.status(500).json({ error: "Failed to fetch admin data" });
     }
   };
+
+  export const filterAdminController = async (req, res) => {
+    try {
+        const { Username, Employee_ID } = req.query;
+
+        let query = `
+            SELECT 
+                Username,
+                Employee_ID
+            FROM admin
+            WHERE 1=1
+        `;
+        const params = [];
+
+        if (Username) {
+            query += ' AND Username = ?';
+            params.push(Username);
+        }
+
+        if (Employee_ID) {
+            query += ' AND Employee_ID = ?';
+            params.push(Employee_ID);
+        }
+
+        const [rows] = await pool.query(query, params);
+        res.json(rows);
+
+    } catch (error) {
+        console.error("Error filtering admins:", error);
+        res.status(500).json({ error: "Failed to filter admin data" });
+    }
+};
