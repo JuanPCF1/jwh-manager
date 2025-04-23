@@ -1,33 +1,97 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@components/Sidebar";
 import styles from "./Warehouse.module.css";
 
 const Warehouse = () => {
   const [isCreatingWarehouse, setIsCreatingWarehouse] = useState(false);
   const [newWarehouse, setNewWarehouse] = useState({
-    locationName: "",
-    numSections: "",
-    owningCompany: "",
+    Location_Name: "",
+    Num_of_Sections: "",
+    Owning_Company: "",
   });
   const [warehouses, setWarehouses] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
 
+  // Fetch all warehouses from the backend
+  useEffect(() => {
+    fetch("http://localhost:5001/api/warehouselocation/getAll")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => setWarehouses(data))
+      .catch((err) => console.error("Error fetching warehouses:", err));
+  }, []);
+
+  // Create a new warehouse
   const handleCreateWarehouse = () => {
     if (
-      newWarehouse.locationName &&
-      newWarehouse.numSections &&
-      newWarehouse.owningCompany
+      newWarehouse.Location_Name &&
+      newWarehouse.Num_of_Sections &&
+      newWarehouse.Owning_Company
     ) {
-      setWarehouses([...warehouses, { ...newWarehouse, id: Date.now() }]);
-      setNewWarehouse({ locationName: "", numSections: "", owningCompany: "" });
-      setIsCreatingWarehouse(false);
+      fetch("http://localhost:5001/api/warehouselocation/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newWarehouse),
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setWarehouses([
+            ...warehouses,
+            { ...newWarehouse, Location_ID: data.locationId },
+          ]);
+          setNewWarehouse({
+            Location_Name: "",
+            Num_of_Sections: "",
+            Owning_Company: "",
+          });
+          setIsCreatingWarehouse(false);
+        })
+        .catch((err) =>
+          console.error("Error creating warehouse location:", err)
+        );
     }
+  };
+
+  // Delete a warehouse
+  const handleDeleteWarehouse = (locationId) => {
+    fetch(`http://localhost:5001/api/warehouselocation/delete/${locationId}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(() => {
+        setWarehouses(
+          warehouses.filter((warehouse) => warehouse.Location_ID !== locationId)
+        );
+      })
+      .catch((err) =>
+        console.error("Error deleting warehouse location:", err)
+      );
   };
 
   const handleCreateSection = (warehouseId) => {
     alert(`Create section for warehouse ID: ${warehouseId}`);
+  };
+
+  const handleViewSections = (warehouseId) => {
+    alert(`View sections for warehouse ID: ${warehouseId}`);
   };
 
   return (
@@ -56,11 +120,11 @@ const Warehouse = () => {
               <label>Location Name</label>
               <input
                 type="text"
-                value={newWarehouse.locationName}
+                value={newWarehouse.Location_Name}
                 onChange={(e) =>
                   setNewWarehouse({
                     ...newWarehouse,
-                    locationName: e.target.value,
+                    Location_Name: e.target.value,
                   })
                 }
               />
@@ -69,11 +133,11 @@ const Warehouse = () => {
               <label># of Sections</label>
               <input
                 type="number"
-                value={newWarehouse.numSections}
+                value={newWarehouse.Num_of_Sections}
                 onChange={(e) =>
                   setNewWarehouse({
                     ...newWarehouse,
-                    numSections: e.target.value,
+                    Num_of_Sections: e.target.value,
                   })
                 }
               />
@@ -82,18 +146,26 @@ const Warehouse = () => {
               <label>Owning Company</label>
               <input
                 type="text"
-                value={newWarehouse.owningCompany}
+                value={newWarehouse.Owning_Company}
                 onChange={(e) =>
                   setNewWarehouse({
                     ...newWarehouse,
-                    owningCompany: e.target.value,
+                    Owning_Company: e.target.value,
                   })
                 }
               />
             </div>
             <div className={styles.formActions}>
-              <button onClick={handleCreateWarehouse}>Save</button>
-              <button onClick={() => setIsCreatingWarehouse(false)}>
+              <button
+                onClick={handleCreateWarehouse}
+                className={styles.saveButton}
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsCreatingWarehouse(false)}
+                className={styles.cancelButton}
+              >
                 Cancel
               </button>
             </div>
@@ -104,24 +176,38 @@ const Warehouse = () => {
           <h2>All Warehouses</h2>
           <div className={styles.warehouseList}>
             {warehouses.map((warehouse) => (
-              <div key={warehouse.id} className={styles.warehouseItem}>
+              <div key={warehouse.Location_ID} className={styles.warehouseItem}>
                 <div className={styles.warehouseDetails}>
                   <p>
-                    <strong>Location:</strong> {warehouse.locationName}
+                    <strong>Location:</strong> {warehouse.Location_Name}
                   </p>
                   <p>
-                    <strong>Sections:</strong> {warehouse.numSections}
+                    <strong>Sections:</strong> {warehouse.Num_of_Sections}
                   </p>
                   <p>
-                    <strong>Owning Company:</strong> {warehouse.owningCompany}
+                    <strong>Owning Company:</strong> {warehouse.Owning_Company}
                   </p>
                 </div>
-                <button
-                  onClick={() => handleCreateSection(warehouse.id)}
-                  className={styles.createSectionButton}
-                >
-                  Create Section
-                </button>
+                <div className={styles.warehouseActions}>
+                  <button
+                    onClick={() => handleCreateSection(warehouse.Location_ID)}
+                    className={styles.createSectionButton}
+                  >
+                    Create Section
+                  </button>
+                  <button
+                    onClick={() => handleViewSections(warehouse.Location_ID)}
+                    className={styles.viewSectionsButton}
+                  >
+                    View Sections
+                  </button>
+                  <button
+                    onClick={() => handleDeleteWarehouse(warehouse.Location_ID)}
+                    className={styles.deleteWarehouseButton}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

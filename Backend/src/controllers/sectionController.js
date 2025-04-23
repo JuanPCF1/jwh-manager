@@ -85,7 +85,7 @@ export const filterSectionController = async (req, res) => {
 
         if (Status) {
             query += ' AND Status = ?';
-            params.push(Status;
+            params.push(Status);
         }
 
         const [rows] = await pool.query(query, params);

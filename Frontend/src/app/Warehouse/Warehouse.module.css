@@ -112,3 +112,67 @@
 .createSectionButton:hover {
   background-color: var(--hover-color);
 }
+
+.warehouseActions {
+  display: flex;
+  gap: 10px;
+}
+
+.createSectionButton,
+.viewSectionsButton,
+.deleteWarehouseButton,
+.saveButton,
+.cancelButton {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.createSectionButton {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+}
+
+.createSectionButton:hover {
+  background-color: var(--hover-color);
+}
+
+.viewSectionsButton {
+  background-color: var(--info-color);
+  color: var(--text-color);
+}
+
+.viewSectionsButton:hover {
+  background-color: #2980b9;
+}
+
+.deleteWarehouseButton {
+  background-color: var(--danger-color);
+  color: var(--text-color);
+}
+
+.deleteWarehouseButton:hover {
+  background-color: #c0392b;
+}
+
+.saveButton {
+  background-color: var(--success-color);
+  color: var(--text-color);
+}
+
+.saveButton:hover {
+  background-color: #27ae60;
+}
+
+.cancelButton {
+  background-color: var(--warning-color);
+  color: var(--text-color);
+}
+
+.cancelButton:hover {
+  background-color: #d35400;
+}
