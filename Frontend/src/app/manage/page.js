@@ -43,11 +43,27 @@ const Manage = () => {
     setHasSearched(true);
 
     if (searchType === "customer") {
-      const results = customers.filter((customer) =>
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(results);
-      setIsLoading(false);
+      try {
+        const res = await fetch(
+          `http://localhost:5001/api/client/filter?Client_Name=${encodeURIComponent(searchTerm)}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+  
+        if (!res.ok) {
+          throw new Error("Clients not found");
+        }
+  
+        const data = await res.json();
+        setSearchResults(data);
+      } catch (err) {
+        console.error("Error fetching clients:", err);
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
     } else if (searchType === "contract") {
       try {
         const res = await fetch(

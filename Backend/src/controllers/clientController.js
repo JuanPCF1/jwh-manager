@@ -59,38 +59,38 @@ export const getAllClientController = async (req, res) => {
 
   export const filterClientController = async (req, res) => {
     try {
-        const { Client_Name, Referred_by, ID } = req.query;
-
-        // Start building the query
-        let query = `
-            SELECT 
-                ID,
-                Client_Name, 
-                Referred_by
-            FROM client
-            WHERE 1=1
-        `;
-        const params = [];
-
-        // Add filters if they are provided
-        if (Client_Name) {
-            query += ' AND Client_Name = ?';
-            params.push(Client_Name);
-        }
-
-        if (Referred_by) {
-            query += ' AND Referred_by = ?';
-            params.push(Referred_by);
-        }
-        if (ID) {
-            query += ' AND ID = ?';
-            params.push(ID);
-        }
-        const [rows] = await pool.query(query, params);
-        res.json(rows);
-
+      const { Client_Name, Referred_by, ID } = req.query;
+  
+      let query = `
+        SELECT 
+          ID,
+          Client_Name, 
+          Referred_by
+        FROM client
+        WHERE 1=1
+      `;
+      const params = [];
+  
+      if (Client_Name) {
+        query += ' AND Client_Name LIKE ?';
+        params.push(`${Client_Name}%`); // starts with
+      }
+  
+      if (Referred_by) {
+        query += ' AND Referred_by LIKE ?';
+        params.push(`${Referred_by}%`); // starts with
+      }
+  
+      if (ID) {
+        query += ' AND ID = ?';
+        params.push(ID);
+      }
+  
+      const [rows] = await pool.query(query, params);
+      res.json(rows);
     } catch (err) {
-        console.error("Error fetching client:", err);
-        res.status(500).json({ error: "Failed to fetch client data" });
+      console.error("Error fetching client:", err);
+      res.status(500).json({ error: "Failed to fetch client data" });
     }
-};
+  };
+  

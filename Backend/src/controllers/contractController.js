@@ -1,4 +1,4 @@
-import {pool} from '../db/database.js';
+import { pool } from '../db/database.js';
 import { hashPassword } from '../utils/authHelper.mjs';
 
 export const createContractController = async (req, res) => {
@@ -65,15 +65,15 @@ export const getContractByIdController = async (req, res) => {
         }
 
         const [result] = await pool.query(
-            'SELECT * FROM contract WHERE `Job#` = ?',
-            [Job_Number]
+            'SELECT * FROM contract WHERE `Job#` LIKE ?',
+            [`%${Job_Number}%`]
         );
 
         if (result.length === 0) {
             return res.status(404).json({ message: 'Contract not found' });
         }
 
-        res.status(200).json(result[0]);
+        res.status(200).json(result);
     } catch (error) {
         console.error('Error fetching contract:', error);
         res.status(500).json({ error: 'Failed to fetch contract' });
